@@ -80,56 +80,11 @@
   #flash { background: #fff; opacity: 0; }
 
   /* ---- Scene C: game interface ---------------------------------- */
-  #couldyou { left: 80px; top: 92px; font-size: 84px; transform-origin: 30% 70%; }
-  #logo { left: 90px; top: 210px; width: 520px; transform-origin: 50% 60%; }
-  #tag { left: 88px; top: 598px; display: flex; flex-wrap: wrap; gap: 0 18px; width: 700px; }
-  #tag span { font: 800 50px/1.2 var(--font-ui); color: #fff; text-shadow: 0 5px 0 var(--base-secondary); display: inline-block; }
+  #couldyou { left: 0; top: 96px; width: 1500px; text-align: center; font-size: 100px; transform-origin: 50% 70%; }
+  #logo { left: 420px; top: 238px; width: 660px; transform-origin: 50% 60%; }
+  #tag { left: 0; top: 752px; width: 1500px; display: flex; justify-content: center; gap: 0 22px; }
+  #tag span { font: 800 64px/1.2 var(--font-ui); color: #fff; text-shadow: 0 6px 0 var(--base-secondary); display: inline-block; }
   #tag span.y { color: var(--accent); }
-  #play { left: 90px; top: 800px; height: 92px; font-size: 34px; transform-origin: 20% 50%; }
-
-  #phone { left: 1015px; top: 60px; width: 440px; height: 880px; border-radius: 44px; background: var(--base-secondary);
-    border: 4px solid var(--base-secondary); box-shadow: 0 14px 0 0 rgba(0,40,55,.55); padding: 14px; transform-origin: 50% 60%; }
-  #screen { position: relative; width: 100%; height: 100%; border-radius: 32px; overflow: hidden; background: var(--base);
-    display: flex; flex-direction: column; }
-  .topbar { display: flex; align-items: center; gap: 10px; padding: 34px 16px 10px; }
-  .topbar img { width: 74px; display: block; }
-  .topbar .meta { font: 700 12px/1.25 var(--font-ui); color: #fff; opacity: .9; }
-  .dots { margin-left: auto; display: flex; gap: 6px; }
-  .dots i { width: 14px; height: 14px; border-radius: 50%; border: 2px solid var(--base-secondary); background: rgba(255,255,255,.35); display: block; }
-  .dots i.on { background: var(--accent); }
-  .cluehead { display: flex; align-items: center; gap: 10px; padding: 8px 16px 10px; }
-  .cluehead .b { width: 30px; height: 30px; border-radius: 50%; background: var(--accent); border: 2px solid var(--base-secondary);
-    display: grid; place-items: center; font: 400 16px/1 var(--font-display); color: #fff; -webkit-text-stroke: 3px var(--base-secondary); paint-order: stroke fill; }
-  .cluehead .dt { font-size: 22px; -webkit-text-stroke-width: 4px; text-shadow: 0 4px 0 var(--base-secondary); }
-  .shot { margin: 0 14px; background: #fff; border: 2px solid var(--base-secondary); border-radius: 12px; box-shadow: 0 6px 1px 0 var(--base-secondary); padding: 6px; }
-  .shot canvas { display: block; width: 100%; height: 232px; border-radius: 8px; image-rendering: pixelated; }
-  .shot .q { position: absolute; }
-  .nextrow { display: flex; align-items: center; justify-content: space-between; padding: 18px 16px 0; }
-  .kb-dock { margin-top: auto; background: var(--base); border-top: 2px solid var(--base-secondary); box-shadow: 0 -6px 0 0 var(--base-secondary); }
-  .kb-bar { display: flex; gap: 8px; padding: 10px 12px; }
-  .kb-bar .kb-field { flex: 1; height: 46px; padding: 0 12px; border-width: 2px; border-radius: 12px; box-shadow: 0 4px 0 0 var(--base-secondary); font-size: 16px; }
-  .kb-bar .kb-field.is-open { outline-width: 3px; outline-offset: 2px; }
-  .kb-bar .kb-caret { width: 2px; }
-  .kb-tray { background: var(--kb-tray-bg); border-top: 2px solid var(--base-secondary); }
-  .kb-suggest { height: 38px; display: flex; align-items: center; gap: 6px; padding: 0 10px; }
-  .kb-hint { font: 600 12px/1 var(--font-ui); color: #fff; opacity: .85; }
-  .kb-chip { padding: 4px 10px; border-radius: 9999px; border: 2px solid var(--base-secondary); background: #fff; color: var(--ink-dark);
-    box-shadow: 0 2px 0 var(--base-secondary); font: 700 13px/1.2 var(--font-ui); white-space: nowrap; }
-  .kb-keys { display: flex; flex-direction: column; gap: 6px; padding: 4px 4px 22px; }
-  .kb-row { display: flex; gap: 5px; }
-  .kb-pad { flex: 0.5 1 0; }
-  .kb-key { flex: 1 1 0; min-width: 0; height: 44px; margin-bottom: 3px; display: grid; place-items: center;
-    border: 2px solid var(--base-secondary); border-radius: 8px; background: #fff; color: var(--ink-dark);
-    box-shadow: 0 3px 0 var(--base-secondary); font: 700 18px/1 var(--font-ui); }
-  .kb-key--mod { flex-grow: 1.5; background: var(--kb-mod-bg); color: #fff; }
-  .kb-key--wide { flex-grow: 2.2; font-size: 14px; font-weight: 800; }
-  .kb-key--space { flex-grow: 5.6; font-size: 14px; color: color-mix(in srgb, var(--ink-dark) 55%, transparent); }
-  .kb-key--go { background: var(--accent); color: var(--base-secondary); }
-  .kb-key.is-down { transform: translateY(3px); box-shadow: 0 0 0 var(--base-secondary); background: var(--accent); color: var(--base-secondary); }
-  .kb-key svg { width: 1.15em; height: 1.15em; }
-
-  #mini { left: 700px; top: 575px; width: 285px; height: 380px; transform-origin: 50% 95%; }
-  #mini img { width: 285px; height: 380px; display: block; }
 </style>
 </head>
 <body>
@@ -166,35 +121,11 @@
     <div id="confetti" class="layer"></div>
   </div>
 
-  <!-- Scene C: game interface + CTA -->
+  <!-- Scene C: challenge end card -->
   <div id="sceneC" class="layer">
     <div id="couldyou" class="abs dt">Could you guess it?</div>
     <img id="logo" class="abs" src="assets/logo-moby.png" alt="Guess Moby's Game">
     <div id="tag" class="abs"><span id="t1">4 clues.</span><span id="t2">1 game.</span><span id="t3" class="y">Can you get it?</span></div>
-    <div id="play" class="abs btn">Play today’s game →</div>
-
-    <div id="phone" class="abs">
-      <div id="screen">
-        <div class="topbar">
-          <img src="assets/logo-moby.png" alt="">
-          <div class="meta">#142 · r/retrogaming<br><span style="opacity:.8">4,812 guessing now</span></div>
-          <div class="dots"><i class="on"></i><i></i><i></i><i></i></div>
-        </div>
-        <div class="cluehead"><span class="b">1</span><span class="dt">A frame from the game</span></div>
-        <div class="shot" style="position:relative"><canvas id="pix" width="54" height="30"></canvas></div>
-        <div class="nextrow"><span class="kb-chip">Reveal next clue +</span><span class="kb-hint">Clue 1 of 4</span></div>
-        <div class="kb-dock">
-          <div class="kb-bar">
-            <div class="kb-field is-open" id="phField"><span id="phText"></span><span class="kb-caret" id="phCaret"></span><span class="kb-ph" id="phPh">Type your guess…</span></div>
-          </div>
-          <div class="kb-tray">
-            <div class="kb-suggest" id="phSuggest"><span class="kb-hint">Start typing a game title</span></div>
-            <div class="kb-keys" id="keys"></div>
-          </div>
-        </div>
-      </div>
-    </div>
-    <div id="mini" class="abs"><img id="miniImg" alt=""></div>
   </div>
 
   <div id="flash" class="layer"></div>
@@ -204,8 +135,6 @@
 // ===== Content (swap the answer here) =====
 const THINK_LINE = 'Hmm… what game was that?';
 const ANSWER = 'Sonic The Hedgehog 2';
-const PHONE_TYPED = 'Son';           // what gets "typed" on the phone keyboard in the CTA
-const PHONE_SUGGEST = ['Sonic The Hedgehog', 'Sonic The Hedgehog 2', 'Sonic CD'];
 
 // ===== Timing helpers =====
 const clamp = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x));
@@ -245,55 +174,6 @@ function clipTime(t) {
 }
 const clipFrame = t => Math.min(CLIP_N, Math.floor(clipTime(t) * CLIP_FPS) + 1);
 const pad = n => String(n).padStart(4, '0');
-
-// ===== Phone keyboard (layout from GuessKeyboard.jsx) =====
-const ICON = {
-  shift: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4 4 12h4.5v7h7v-7H20z"/></svg>',
-  back: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5h11v14H9l-6-7z"/><path d="m12 9 5 6m0-6-5 6"/></svg>',
-};
-const ROWS = [
-  ['q','w','e','r','t','y','u','i','o','p'],
-  ['{pad}','a','s','d','f','g','h','j','k','l','{pad}'],
-  ['{shift}','z','x','c','v','b','n','m','{back}'],
-  ['{mode}','{space}','{enter}'],
-];
-const keyEls = {};
-function buildKeys() {
-  const host = $('keys');
-  for (const row of ROWS) {
-    const r = document.createElement('div'); r.className = 'kb-row';
-    for (const k of row) {
-      const el = document.createElement('span');
-      if (k === '{pad}') { el.className = 'kb-pad'; r.appendChild(el); continue; }
-      el.className = 'kb-key';
-      if (k === '{shift}') { el.classList.add('kb-key--mod'); el.innerHTML = ICON.shift; }
-      else if (k === '{back}') { el.classList.add('kb-key--mod'); el.innerHTML = ICON.back; }
-      else if (k === '{mode}') { el.classList.add('kb-key--mod', 'kb-key--wide'); el.textContent = '123'; }
-      else if (k === '{space}') { el.classList.add('kb-key--space'); el.textContent = 'space'; }
-      else if (k === '{enter}') { el.classList.add('kb-key--go', 'kb-key--wide'); el.textContent = 'Guess'; }
-      else el.textContent = k;
-      keyEls[k] = el; r.appendChild(el);
-    }
-    host.appendChild(r);
-  }
-}
-
-// Pixelated "mystery frame" for the clue card — deliberately abstract.
-function drawPix() {
-  const c = $('pix'), g = c.getContext('2d'), W = c.width, H = c.height;
-  let seed = 7; const rnd = () => (seed = (seed * 16807) % 2147483647) / 2147483647;
-  for (let y = 0; y < H; y++) for (let x = 0; x < W; x++) {
-    let col;
-    const hill = 18 + Math.sin(x / 5) * 3 + Math.sin(x / 2.3) * 1.2;
-    if (y < 7) col = [40, 110 + y * 8, 220];
-    else if (y < hill) col = [70 + rnd() * 30, 150 + rnd() * 30, 235];
-    else if (y < hill + 2) col = [70, 190 + rnd() * 40, 60];
-    else col = ((Math.floor(x / 3) + Math.floor(y / 3)) % 2) ? [190, 110, 40] : [150, 80, 30];
-    if (Math.abs(x - 34) < 3 && y > hill - 5 && y < hill) col = [30, 70, 200];
-    if (y > 8 && y < 12 && x % 13 < 5) col = [255, 255, 255];
-    g.fillStyle = `rgb(${col.map(Math.round).join(',')})`; g.fillRect(x, y, 1, 1);
-  }
-}
 
 // ===== Frame renderer =====
 const DUR = 8, FPS = 60;
@@ -399,59 +279,24 @@ function renderAB(t) {
 }
 
 function renderC(t) {
-  const lt = t - 5;
   pop($('couldyou'), t, 5.05, 99, 'rotate(-3deg)');
   pop($('logo'), t, 5.3);
   ['t1', 't2', 't3'].forEach((id, i) => {
     const k = easeOut(prog(t, 6.0 + i * 0.28, 6.3 + i * 0.28));
     set($(id), k, `translateY(${lerp(40, 0, k)}px) scale(${lerp(0.8, 1, back(k))})`);
   });
-  pop($('play'), t, 6.95);
-  // CTA button gentle breathing once in
-  if (t > 7.4) $('play').style.transform = `scale(${1 + 0.025 * Math.sin((t - 7.4) * 8)})`;
-
-  // Phone slides up
-  const ph = spring(prog(t, 5.0, 5.7), 2.2, 6);
-  set($('phone'), clamp(prog(t, 5.0, 5.15)), `translateY(${lerp(700, 0, ph)}px) rotate(${lerp(8, 2, ph)}deg)`);
-
-  // Typing on the phone keyboard 6.4–7.3
-  const seq = [...PHONE_TYPED];
-  const typeStart = 6.45, step = 0.24;
-  let typed = 0, down = null;
-  seq.forEach((ch, i) => {
-    const at = typeStart + i * step;
-    if (t >= at) typed = i + 1;
-    if (t >= at - 0.08 && t < at + 0.05) down = ch.toLowerCase();
-  });
-  if (t >= typeStart - 0.3 && t < typeStart - 0.18) down = '{shift}';
-  Object.entries(keyEls).forEach(([k, el]) => el.classList.toggle('is-down', k === down));
-  const shifted = typed === 0;
-  Object.entries(keyEls).forEach(([k, el]) => { if (k.length === 1) el.textContent = shifted ? k.toUpperCase() : k; });
-  $('phText').textContent = PHONE_TYPED.slice(0, typed);
-  $('phPh').style.display = typed ? 'none' : 'inline';
-  $('phCaret').style.opacity = Math.floor(t * 2.5) % 2 === 0 || (t > typeStart - 0.1 && t < typeStart + seq.length * step) ? 1 : 0;
-  const sug = $('phSuggest');
-  const wantChips = typed > 0;
-  if (wantChips && !sug.dataset.chips) {
-    sug.innerHTML = PHONE_SUGGEST.map(s => `<span class="kb-chip">${s}</span>`).join('');
-    sug.dataset.chips = '1';
-  } else if (!wantChips && sug.dataset.chips) {
-    sug.innerHTML = '<span class="kb-hint">Start typing a game title</span>'; delete sug.dataset.chips;
+  // logo floats gently once it has landed (README wobble, scaled down)
+  if (t > 5.9) {
+    const lp = ((t - 5.9) % 2) / 2;
+    const rot = track(lp, [[0, 0], [0.175, -2], [0.425, 1.6], [0.675, -1.2], [1, 0]]);
+    const my = track(lp, [[0, 0], [0.25, -8], [0.5, 2], [0.75, -5], [1, 0]]);
+    $('logo').style.transform = `translateY(${my}px) rotate(${rot}deg)`;
   }
-
-  // Mini Moby (happy pose) with the README wobble: rotate [0,-5,4,-3,0], x [0,4,-3,2,0], y [0,-8,2,-5,0] over 2s
-  $('miniImg').src = mobyCache[CLIP_N].src;
-  const lp = ((lt - 0.4) % 2 + 2) % 2 / 2;
-  const rot = track(lp, [[0, 0], [0.175, -5], [0.425, 4], [0.675, -3], [1, 0]]);
-  const mx = track(lp, [[0, 0], [0.2, 4], [0.45, -3], [0.7, 2], [1, 0]]);
-  const my = track(lp, [[0, 0], [0.25, -8], [0.5, 2], [0.75, -5], [1, 0]]);
-  const mi = spring(prog(t, 5.4, 6.0));
-  set($('mini'), clamp(prog(t, 5.4, 5.5)), `translate(${lerp(-160, 0, easeOut(prog(t, 5.4, 5.8))) + mx * 2}px, ${my * 2}px) rotate(${rot}deg) scale(${mi})`);
 }
 
 window.DUR = DUR; window.FPS = FPS; window.renderAt = renderAt;
 window.ready = (async () => {
-  buildKeys(); drawPix(); buildConfetti();
+  buildConfetti();
   await document.fonts.load('40px "Fugaz One"'); await document.fonts.load('700 40px "Work Sans"'); await document.fonts.load('800 40px "Work Sans"');
   await preloadMoby();
   await renderAt(0);
