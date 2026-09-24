@@ -66,7 +66,7 @@
   .dt.y { color: var(--accent); }
 
   #wait  { left: 80px; top: 120px; font-size: 128px; transform-origin: 30% 70%; }
-  #gotit { left: 70px; top: 262px; font-size: 150px; transform-origin: 40% 70%; }
+  #gotit { left: 70px; top: 268px; font-size: 136px; transform-origin: 40% 70%; }
 
   #answer { left: 80px; top: 500px; display: flex; gap: 16px; align-items: stretch; }
   #answer .kb-field { width: 610px; }
@@ -109,7 +109,7 @@
     <div id="chip3" class="abs chip" style="left:100px; top:630px"><span class="badge">3</span>That iconic detail…</div>
 
     <div id="wait" class="abs dt">WAIT…</div>
-    <div id="gotit" class="abs dt y">I GOT IT!</div>
+    <div id="gotit" class="abs dt y">I GUESS IT!</div>
 
     <div id="answer" class="abs">
       <div class="kb-field" id="ansField"><span id="ansText"></span><span class="kb-caret" id="ansCaret"></span><span class="kb-ph" id="ansPh">Type your guess…</span></div>
@@ -249,7 +249,7 @@ function renderAB(t) {
     set(el, clamp(kin * 5) * (1 - out), `translate(${-easeIn(out) * 240}px, ${fl - easeIn(out) * 60 * (i - 1)}px) rotate(${(1 - s) * -8 + (i - 1) * 1.5}deg) scale(${Math.max(0, s) * (1 - 0.4 * out)})`);
   });
 
-  // ---- "WAIT… I GOT IT!" ----
+  // ---- "WAIT… I GUESS IT!" ----
   const shake = (a) => (r > a && r < a + 0.3 ? Math.sin((r - a) * 90) * 10 * (1 - prog(r, a, a + 0.3)) : 0);
   pop($('wait'), r, 2.08, 99, `translateX(${shake(2.08)}px) rotate(-4deg)`);
   pop($('gotit'), r, 2.4, 99, `translateX(${shake(2.4)}px) rotate(-3deg)`);
