@@ -47,15 +47,17 @@
   .kb-ph { color: color-mix(in srgb, var(--ink-dark) 45%, transparent); font-weight: 600; }
   .kb-caret { width: 4px; height: 1.15em; border-radius: 2px; background: currentColor; flex: none; }
 
-  #think { left: 70px; top: 150px; transform-origin: 92% 100%; }
+  #think { left: 70px; top: 90px; transform-origin: 92% 100%; }
+  #thinkField { height: auto; padding: 18px 36px 20px; font-size: 56px; line-height: 1.22; border-radius: 28px; align-items: flex-end; }
+  #thinkField .kb-caret { margin-bottom: 0.12em; }
   .puff { position: absolute; background: #fff; border: 4px solid var(--base-secondary); border-radius: 50%; box-shadow: 0 5px 0 0 var(--base-secondary); }
 
   /* Clue chips (.kb-chip, 2x) with the yellow clue-number badge */
-  .chip { display: inline-flex; align-items: center; gap: 14px; padding: 10px 26px 10px 10px;
+  .chip { display: inline-flex; align-items: center; gap: 18px; padding: 12px 34px 12px 12px;
     border-radius: 9999px; border: 4px solid var(--base-secondary); background: #fff; color: var(--ink-dark);
-    box-shadow: 0 5px 0 var(--base-secondary); font: 700 32px/1 var(--font-ui); white-space: nowrap; transform-origin: 20% 50%; }
-  .badge { width: 52px; height: 52px; border-radius: 50%; background: var(--accent); border: 4px solid var(--base-secondary);
-    display: grid; place-items: center; font: 400 28px/1 var(--font-display); color: #fff;
+    box-shadow: 0 5px 0 var(--base-secondary); font: 700 46px/1 var(--font-ui); white-space: nowrap; transform-origin: 20% 50%; }
+  .badge { width: 70px; height: 70px; border-radius: 50%; background: var(--accent); border: 4px solid var(--base-secondary);
+    display: grid; place-items: center; font: 400 38px/1 var(--font-display); color: #fff;
     -webkit-text-stroke: 5px var(--base-secondary); paint-order: stroke fill; flex: none; }
 
   /* Display type (.dt / .display) — Fugaz One + stroke + hard shadow */
@@ -83,7 +85,7 @@
   #logo { left: 390px; top: 150px; width: 720px; transform-origin: 50% 60%; }
   #tag { left: 0; top: 720px; width: 1500px; display: flex; justify-content: center; gap: 0 22px; }
   #tag span { font: 800 64px/1.2 var(--font-ui); color: #fff; text-shadow: 0 6px 0 var(--base-secondary); display: inline-block; }
-  #tag span.y { color: var(--accent); }
+  #tag span.y { color: var(--accent); font: 400 70px/1.2 var(--font-display); -webkit-text-stroke: 10px var(--base-secondary); paint-order: stroke fill; text-shadow: 0 8px 0 var(--base-secondary); }
 </style>
 </head>
 <body>
@@ -98,13 +100,13 @@
 
     <div id="think" class="abs">
       <div class="kb-field" id="thinkField"><span id="thinkText"></span><span class="kb-caret" id="thinkCaret"></span></div>
-      <div class="puff" id="p1" style="left:668px; top:112px; width:34px; height:34px"></div>
-      <div class="puff" id="p2" style="left:712px; top:150px; width:22px; height:22px"></div>
+      <div class="puff" id="p1" style="right:-40px; bottom:-26px; width:40px; height:40px"></div>
+      <div class="puff" id="p2" style="right:-78px; bottom:-56px; width:26px; height:26px"></div>
     </div>
 
-    <div id="chip1" class="abs chip" style="left:100px; top:350px"><span class="badge">1</span>Specific frame…</div>
-    <div id="chip2" class="abs chip" style="left:250px; top:465px"><span class="badge">2</span>Released in…</div>
-    <div id="chip3" class="abs chip" style="left:120px; top:580px"><span class="badge">3</span>That iconic detail…</div>
+    <div id="chip1" class="abs chip" style="left:80px; top:350px"><span class="badge">1</span>Specific frame…</div>
+    <div id="chip2" class="abs chip" style="left:220px; top:490px"><span class="badge">2</span>Released in…</div>
+    <div id="chip3" class="abs chip" style="left:100px; top:630px"><span class="badge">3</span>That iconic detail…</div>
 
     <div id="wait" class="abs dt">WAIT…</div>
     <div id="gotit" class="abs dt y">I GOT IT!</div>
@@ -131,8 +133,8 @@
 
 <script>
 // ===== Content (swap the answer here) =====
-const THINK_LINE = 'Hmm… what game was that?';
-const ANSWER = 'Sonic The Hedgehog 2';
+const THINK_LINE = 'Hmm…\nwhat game was that?';
+const ANSWER = 'Adventure';
 
 // ===== Timing helpers =====
 const clamp = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x));
