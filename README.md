@@ -5,8 +5,8 @@ Final render: `out/guess-mobys-game-10s.mp4` (1500×1000, 60fps, 10s, H.264 + AA
 | Time | Beat |
 |------|------|
 | 0–4s | Moby thinks. A guess-bubble thought ("Hmm… what game was that?") types itself in, and the clue chips flash in: *Specific frame… / Released in… / That iconic detail…* |
-| 4–7s | Moby blinks and lights up (glow + rays): **WAIT… I GUESS IT!** The answer is typed into the guess bar, Guess is pressed, then a "Pixel Perfect" confirmation and confetti |
-| 7–10s | Flash cut to a centred end card: the logo, then *4 clues. 1 game. Can you get it?* |
+| 4–7s | Moby blinks and lights up (glow + rays): **WAIT… I GOT IT!** The answer is typed into the guess bar, Guess is pressed, then a "Pixel Perfect" confirmation and confetti |
+| 7–10s | Flash cut to a centred end card: the logo, then *4 clues. 1 game. Can you guess it?* |
 
 The bubbles, chips, keys and buttons use the mobile keyboard styles (`.kb-*`) and mode-1 tokens from
 [hernandez-afk/gmg](https://github.com/hernandez-afk/gmg). Type is Fugaz One and Work Sans.

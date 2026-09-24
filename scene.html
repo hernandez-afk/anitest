@@ -66,7 +66,7 @@
   .dt.y { color: var(--accent); }
 
   #wait  { left: 80px; top: 120px; font-size: 128px; transform-origin: 30% 70%; }
-  #gotit { left: 70px; top: 268px; font-size: 136px; transform-origin: 40% 70%; }
+  #gotit { left: 70px; top: 262px; font-size: 150px; transform-origin: 40% 70%; }
 
   #answer { left: 80px; top: 500px; display: flex; gap: 16px; align-items: stretch; }
   #answer .kb-field { width: 610px; }
@@ -109,7 +109,7 @@
     <div id="chip3" class="abs chip" style="left:100px; top:630px"><span class="badge">3</span>That iconic detail…</div>
 
     <div id="wait" class="abs dt">WAIT…</div>
-    <div id="gotit" class="abs dt y">I GUESS IT!</div>
+    <div id="gotit" class="abs dt y">I GOT IT!</div>
 
     <div id="answer" class="abs">
       <div class="kb-field" id="ansField"><span id="ansText"></span><span class="kb-caret" id="ansCaret"></span><span class="kb-ph" id="ansPh">Type your guess…</span></div>
@@ -125,7 +125,7 @@
   <!-- Scene C: challenge end card -->
   <div id="sceneC" class="layer">
     <img id="logo" class="abs" src="assets/logo-moby.png" alt="Guess Moby's Game">
-    <div id="tag" class="abs"><span id="t1">4 clues.</span><span id="t2">1 game.</span><span id="t3" class="y">Can you get it?</span></div>
+    <div id="tag" class="abs"><span id="t1">4 clues.</span><span id="t2">1 game.</span><span id="t3" class="y">Can you guess it?</span></div>
   </div>
 
   <div id="flash" class="layer"></div>
@@ -172,7 +172,9 @@ function clipTime(t) {
   if (t < 3.9) return 0.3 + t * (3.7 / 3.9);
   return Math.min(4.0 + (t - 3.9), 5.0);
 }
-const clipFrame = t => Math.min(CLIP_N, Math.floor(clipTime(t) * CLIP_FPS) + 1);
+// Frames 109–112 run off the edge of the source video (tail clipped), so hold 108 → jump to 113.
+const CLIPPED = { 109: 108, 110: 108, 111: 113, 112: 113 };
+const clipFrame = t => { const f = Math.min(CLIP_N, Math.floor(clipTime(t) * CLIP_FPS) + 1); return CLIPPED[f] || f; };
 const pad = n => String(n).padStart(4, '0');
 
 // ===== Frame renderer =====
@@ -219,7 +221,10 @@ function renderAB(t) {
   const enter = easeOut(prog(t, 0, 0.45));
   const lit = spring(prog(r, 2.35, 2.95));        // body "lights up" bounce
   const bob = r > 2.95 ? Math.sin((r - 2.95) * 5.2) * 8 : 0;
-  const sc = lerp(0.94, 1, enter) * (1 + 0.07 * Math.sin(Math.PI * clamp(prog(r, 2.35, 2.75))));
+  // The thinking pose is drawn smaller than the lit-up pose in the source, so
+  // scale it up during the hook and ease back as the pose changes (~4.4s).
+  const hookScale = lerp(1.12, 1, easeInOut(prog(t, 4.15, 4.5)));
+  const sc = hookScale * lerp(0.94, 1, enter) * (1 + 0.07 * Math.sin(Math.PI * clamp(prog(r, 2.35, 2.75))));
   const tilt = r > 2.95 ? Math.sin((r - 2.95) * 5.2) * 1.6 : 0;
   set($('moby'), 1, `translate(${lerp(90, 0, enter)}px, ${bob}px) scale(${sc}) rotate(${tilt}deg)`);
 
@@ -249,7 +254,7 @@ function renderAB(t) {
     set(el, clamp(kin * 5) * (1 - out), `translate(${-easeIn(out) * 240}px, ${fl - easeIn(out) * 60 * (i - 1)}px) rotate(${(1 - s) * -8 + (i - 1) * 1.5}deg) scale(${Math.max(0, s) * (1 - 0.4 * out)})`);
   });
 
-  // ---- "WAIT… I GUESS IT!" ----
+  // ---- "WAIT… I GOT IT!" ----
   const shake = (a) => (r > a && r < a + 0.3 ? Math.sin((r - a) * 90) * 10 * (1 - prog(r, a, a + 0.3)) : 0);
   pop($('wait'), r, 2.08, 99, `translateX(${shake(2.08)}px) rotate(-4deg)`);
   pop($('gotit'), r, 2.4, 99, `translateX(${shake(2.4)}px) rotate(-3deg)`);
