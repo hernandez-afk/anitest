@@ -1,12 +1,12 @@
-# Guess Moby's Game: 8-second spot
+# Guess Moby's Game: 10-second spot
 
-Final render: `out/guess-mobys-game-8s.mp4` (1500×1000, 60fps, 8s, H.264 + AAC)
+Final render: `out/guess-mobys-game-10s.mp4` (1500×1000, 60fps, 10s, H.264 + AAC)
 
 | Time | Beat |
 |------|------|
-| 0–2s | Moby thinks. A guess-bubble thought ("Hmm… what game was that?") types itself in, and the clue chips flash in: *Specific frame… / Released in… / That iconic detail…* |
-| 2–5s | Moby blinks and lights up (glow + rays): **WAIT… I GOT IT!** The answer is typed into the guess bar, Guess is pressed, then a "Pixel Perfect" confirmation and confetti |
-| 5–8s | Flash cut to a centred end card: **Could you guess it?**, the logo, and *4 clues. 1 game. Can you get it?* |
+| 0–4s | Moby thinks. A guess-bubble thought ("Hmm… what game was that?") types itself in, and the clue chips flash in: *Specific frame… / Released in… / That iconic detail…* |
+| 4–7s | Moby blinks and lights up (glow + rays): **WAIT… I GOT IT!** The answer is typed into the guess bar, Guess is pressed, then a "Pixel Perfect" confirmation and confetti |
+| 7–10s | Flash cut to a centred end card: the logo, then *4 clues. 1 game. Can you get it?* |
 
 The bubbles, chips, keys and buttons use the mobile keyboard styles (`.kb-*`) and mode-1 tokens from
 [hernandez-afk/gmg](https://github.com/hernandez-afk/gmg). Type is Fugaz One and Work Sans.
@@ -21,4 +21,4 @@ node scripts/render.cjs --stills 1,2.5,6   # quick preview PNGs
 ```
 
 To change the copy or the answer, edit the constants at the top of the `<script>` in `scene.html`.
-The Moby clip is retimed in `clipTime()`: the thinking beat is 0.3–2.2s and the realization is 4.0–5.02s.
+The Moby clip is retimed in `clipTime()`: its thinking beat (0.3–4.0s) is stretched over 0–3.9s, then the realization (4.0–5.02s) plays at normal speed.

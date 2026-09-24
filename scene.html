@@ -80,9 +80,8 @@
   #flash { background: #fff; opacity: 0; }
 
   /* ---- Scene C: game interface ---------------------------------- */
-  #couldyou { left: 0; top: 96px; width: 1500px; text-align: center; font-size: 100px; transform-origin: 50% 70%; }
-  #logo { left: 420px; top: 238px; width: 660px; transform-origin: 50% 60%; }
-  #tag { left: 0; top: 752px; width: 1500px; display: flex; justify-content: center; gap: 0 22px; }
+  #logo { left: 390px; top: 150px; width: 720px; transform-origin: 50% 60%; }
+  #tag { left: 0; top: 720px; width: 1500px; display: flex; justify-content: center; gap: 0 22px; }
   #tag span { font: 800 64px/1.2 var(--font-ui); color: #fff; text-shadow: 0 6px 0 var(--base-secondary); display: inline-block; }
   #tag span.y { color: var(--accent); }
 </style>
@@ -123,7 +122,6 @@
 
   <!-- Scene C: challenge end card -->
   <div id="sceneC" class="layer">
-    <div id="couldyou" class="abs dt">Could you guess it?</div>
     <img id="logo" class="abs" src="assets/logo-moby.png" alt="Guess Moby's Game">
     <div id="tag" class="abs"><span id="t1">4 clues.</span><span id="t2">1 game.</span><span id="t3" class="y">Can you get it?</span></div>
   </div>
@@ -165,18 +163,18 @@ function pop(el, t, a, b = 99, extra = '') {
 }
 
 // ===== Moby clip retime =====
-// Source is ~24.1fps, 121 frames. Thinking beat 0.3–2.2s, then jump to the
-// blink + "lights up" beat (4.0–5.02s) so the realization lands at ~2.1s.
+// Source is ~24.1fps, 121 frames. The thinking beat (0.3–4.0s) is stretched
+// over 0–3.9s, then the blink + "lights up" beat (4.0–5.02s) plays through.
 const CLIP_FPS = 24.1, CLIP_N = 121;
 function clipTime(t) {
-  if (t < 1.9) return 0.3 + t;
-  return Math.min(4.0 + (t - 1.9), 5.0);
+  if (t < 3.9) return 0.3 + t * (3.7 / 3.9);
+  return Math.min(4.0 + (t - 3.9), 5.0);
 }
 const clipFrame = t => Math.min(CLIP_N, Math.floor(clipTime(t) * CLIP_FPS) + 1);
 const pad = n => String(n).padStart(4, '0');
 
 // ===== Frame renderer =====
-const DUR = 8, FPS = 60;
+const DUR = 10, FPS = 60;
 const mobyCache = {};
 async function preloadMoby() {
   // Decode sequentially — many parallel decodes can fail in headless Chromium.
@@ -197,50 +195,51 @@ function buildConfetti() {
 }
 
 async function renderAt(t) {
-  // Background loop (60fps, 480 frames)
-  const bf = Math.min(480, Math.floor(t * 60) + 1);
+  // Background loop (60fps, 480 frames) — wraps after 8s
+  const bf = (Math.floor(t * 60) % 480) + 1;
   const bg = $('bg'); const src = `build/bg/${pad(bf)}.jpg`;
   if (!bg.src.endsWith(src)) { bg.src = src; await bg.decode(); }
 
-  const inC = t >= 5.0;
+  const inC = t >= 7.0;
   $('sceneAB').style.display = inC ? 'none' : 'block';
   $('sceneC').style.display = inC ? 'block' : 'none';
 
-  // Cut flash at 5.0
-  $('flash').style.opacity = t >= 4.93 && t < 5.2 ? (t < 5 ? prog(t, 4.93, 5) : 1 - prog(t, 5, 5.2)) * 0.9 : 0;
+  // Cut flash at 7.0
+  $('flash').style.opacity = t >= 6.93 && t < 7.2 ? (t < 7 ? prog(t, 6.93, 7) : 1 - prog(t, 7, 7.2)) * 0.9 : 0;
 
   if (!inC) renderAB(t); else renderC(t);
 }
 
 function renderAB(t) {
+  const r = t - 2;   // realization/answer beats were authored at 2–5s; they now play at 4–7s
   // ---- Moby ----
   $('mobyImg').src = mobyCache[clipFrame(t)].src;
   const enter = easeOut(prog(t, 0, 0.45));
-  const lit = spring(prog(t, 2.35, 2.95));        // body "lights up" bounce
-  const bob = t > 2.95 ? Math.sin((t - 2.95) * 5.2) * 8 : 0;
-  const sc = lerp(0.94, 1, enter) * (1 + 0.07 * Math.sin(Math.PI * clamp(prog(t, 2.35, 2.75))));
-  const tilt = t > 2.95 ? Math.sin((t - 2.95) * 5.2) * 1.6 : 0;
+  const lit = spring(prog(r, 2.35, 2.95));        // body "lights up" bounce
+  const bob = r > 2.95 ? Math.sin((r - 2.95) * 5.2) * 8 : 0;
+  const sc = lerp(0.94, 1, enter) * (1 + 0.07 * Math.sin(Math.PI * clamp(prog(r, 2.35, 2.75))));
+  const tilt = r > 2.95 ? Math.sin((r - 2.95) * 5.2) * 1.6 : 0;
   set($('moby'), 1, `translate(${lerp(90, 0, enter)}px, ${bob}px) scale(${sc}) rotate(${tilt}deg)`);
 
   // glow + rays for the realization
-  const g = easeOut(prog(t, 2.3, 2.6)) * (1 - 0.25 * (0.5 + 0.5 * Math.sin(t * 7)) * prog(t, 2.6, 3));
-  set($('glow'), g, `scale(${lerp(0.4, 1, easeOut(prog(t, 2.3, 2.7)))})`);
-  set($('rays'), 0.9 * easeOut(prog(t, 2.3, 2.7)), `rotate(${t * 22}deg) scale(${lerp(0.5, 1, easeOut(prog(t, 2.3, 2.7)))})`);
+  const g = easeOut(prog(r, 2.3, 2.6)) * (1 - 0.25 * (0.5 + 0.5 * Math.sin(t * 7)) * prog(r, 2.6, 3));
+  set($('glow'), g, `scale(${lerp(0.4, 1, easeOut(prog(r, 2.3, 2.7)))})`);
+  set($('rays'), 0.9 * easeOut(prog(r, 2.3, 2.7)), `rotate(${t * 22}deg) scale(${lerp(0.5, 1, easeOut(prog(r, 2.3, 2.7)))})`);
 
   // ---- Thought bubble: "Hmm… what game was that?" ----
-  const thinkIn = prog(t, 0.12, 0.62), thinkOut = prog(t, 1.9, 2.06);
+  const thinkIn = prog(t, 0.2, 0.75), thinkOut = prog(t, 3.9, 4.06);
   const ts = spring(thinkIn) * (1 - easeIn(thinkOut));
   set($('think'), clamp(thinkIn * 4) * (1 - thinkOut), `translateY(${Math.sin(t * 3) * 4}px) scale(${ts})`);
-  const n = Math.round(THINK_LINE.length * prog(t, 0.35, 1.25));
+  const n = Math.round(THINK_LINE.length * prog(t, 0.55, 2.1));
   $('thinkText').textContent = THINK_LINE.slice(0, n);
   $('thinkCaret').style.opacity = (n < THINK_LINE.length || Math.floor(t * 2) % 2 === 0) ? 1 : 0;
-  $('p1').style.opacity = clamp(prog(t, 0.35, 0.45)); $('p2').style.opacity = clamp(prog(t, 0.45, 0.55));
+  $('p1').style.opacity = clamp(prog(t, 0.55, 0.7)); $('p2').style.opacity = clamp(prog(t, 0.7, 0.85));
 
   // ---- Clue chips flash in, float, then scatter at the realization ----
-  [['chip1', 0.72], ['chip2', 1.0], ['chip3', 1.28]].forEach(([id, a], i) => {
+  [['chip1', 1.5], ['chip2', 2.15], ['chip3', 2.8]].forEach(([id, a], i) => {
     const el = $(id);
     const fl = Math.sin(t * 3.4 + i * 2) * 6;
-    const out = prog(t, 1.92 + i * 0.03, 2.12 + i * 0.03);
+    const out = prog(t, 3.92 + i * 0.03, 4.12 + i * 0.03);
     const kin = prog(t, a, a + 0.5);
     const s = spring(kin);
     const flick = kin > 0 && kin < 0.2 ? 1.25 : 1;   // quick "flash" on arrival
@@ -249,45 +248,44 @@ function renderAB(t) {
   });
 
   // ---- "WAIT… I GOT IT!" ----
-  const shake = (a) => (t > a && t < a + 0.3 ? Math.sin((t - a) * 90) * 10 * (1 - prog(t, a, a + 0.3)) : 0);
-  pop($('wait'), t, 2.08, 99, `translateX(${shake(2.08)}px) rotate(-4deg)`);
-  pop($('gotit'), t, 2.4, 99, `translateX(${shake(2.4)}px) rotate(-3deg)`);
+  const shake = (a) => (r > a && r < a + 0.3 ? Math.sin((r - a) * 90) * 10 * (1 - prog(r, a, a + 0.3)) : 0);
+  pop($('wait'), r, 2.08, 99, `translateX(${shake(2.08)}px) rotate(-4deg)`);
+  pop($('gotit'), r, 2.4, 99, `translateX(${shake(2.4)}px) rotate(-3deg)`);
 
   // ---- Answer reveal in the guess bar ----
-  const barIn = easeOut(prog(t, 3.0, 3.3));
+  const barIn = easeOut(prog(r, 3.0, 3.3));
   set($('answer'), barIn, `translateY(${lerp(60, 0, barIn)}px)`);
-  const an = Math.round(ANSWER.length * prog(t, 3.3, 3.95));
+  const an = Math.round(ANSWER.length * prog(r, 3.3, 3.95));
   $('ansText').textContent = ANSWER.slice(0, an);
   $('ansPh').style.display = an ? 'none' : 'inline';
-  $('ansCaret').style.opacity = t < 4.05 && (an < ANSWER.length || Math.floor(t * 3) % 2 === 0) ? 1 : 0;
-  $('ansField').classList.toggle('is-open', t < 4.05);
-  const press = t >= 4.02 && t < 4.14;
+  $('ansCaret').style.opacity = r < 4.05 && (an < ANSWER.length || Math.floor(t * 3) % 2 === 0) ? 1 : 0;
+  $('ansField').classList.toggle('is-open', r < 4.05);
+  const press = r >= 4.02 && r < 4.14;
   $('ansBtn').style.transform = press ? 'translateY(10px)' : 'none';
   $('ansBtn').style.boxShadow = press ? '0 0 0 0 var(--base-secondary)' : '';
   // solved: the field pulses
-  const solved = prog(t, 4.12, 4.5);
-  $('ansField').style.borderColor = t >= 4.12 ? 'rgb(255,174,23)' : '';
-  $('ansField').style.transform = t >= 4.12 ? `scale(${1 + 0.05 * Math.sin(Math.PI * solved)})` : 'none';
-  pop($('correct'), t, 4.16, 99, 'rotate(-2deg)');
+  const solved = prog(r, 4.12, 4.5);
+  $('ansField').style.borderColor = r >= 4.12 ? 'rgb(255,174,23)' : '';
+  $('ansField').style.transform = r >= 4.12 ? `scale(${1 + 0.05 * Math.sin(Math.PI * solved)})` : 'none';
+  pop($('correct'), r, 4.16, 99, 'rotate(-2deg)');
 
   // confetti burst from the Guess button
-  const ck = prog(t, 4.12, 5.0);
+  const ck = prog(r, 4.12, 5.0);
   CONF.forEach(c => {
     const dx = Math.cos(c.a) * c.v * easeOut(ck), dy = Math.sin(c.a) * c.v * easeOut(ck) + 520 * ck * ck;
-    set(c.el, ck > 0 ? 1 - prog(t, 4.7, 5.0) : 0, `translate(${860 + dx}px, ${550 + dy}px) rotate(${c.rot * ck}deg) scaleX(${c.sx})`);
+    set(c.el, ck > 0 ? 1 - prog(r, 4.7, 5.0) : 0, `translate(${860 + dx}px, ${550 + dy}px) rotate(${c.rot * ck}deg) scaleX(${c.sx})`);
   });
 }
 
 function renderC(t) {
-  pop($('couldyou'), t, 5.05, 99, 'rotate(-3deg)');
-  pop($('logo'), t, 5.3);
+  pop($('logo'), t, 7.1);
   ['t1', 't2', 't3'].forEach((id, i) => {
-    const k = easeOut(prog(t, 6.0 + i * 0.28, 6.3 + i * 0.28));
+    const k = easeOut(prog(t, 7.75 + i * 0.3, 8.05 + i * 0.3));
     set($(id), k, `translateY(${lerp(40, 0, k)}px) scale(${lerp(0.8, 1, back(k))})`);
   });
   // logo floats gently once it has landed (README wobble, scaled down)
-  if (t > 5.9) {
-    const lp = ((t - 5.9) % 2) / 2;
+  if (t > 7.7) {
+    const lp = ((t - 7.7) % 2) / 2;
     const rot = track(lp, [[0, 0], [0.175, -2], [0.425, 1.6], [0.675, -1.2], [1, 0]]);
     const my = track(lp, [[0, 0], [0.25, -8], [0.5, 2], [0.75, -5], [1, 0]]);
     $('logo').style.transform = `translateY(${my}px) rotate(${rot}deg)`;
