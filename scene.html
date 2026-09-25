@@ -32,8 +32,9 @@
   #rays { left: 600px; top: -50px; width: 1000px; height: 1000px; border-radius: 50%; opacity: 0;
     background: repeating-conic-gradient(rgba(255,230,160,.55) 0 9deg, rgba(255,230,160,0) 9deg 22.5deg);
     -webkit-mask: radial-gradient(circle, #000 18%, transparent 66%); mask: radial-gradient(circle, #000 18%, transparent 66%); }
-  #moby { left: 800px; top: 90px; width: 648px; height: 864px; transform-origin: 50% 90%; }
-  #moby img { width: 648px; height: 864px; display: block; }
+  /* frames are 648×912: the 864px source plus 24px headroom top and bottom */
+  #moby { left: 800px; top: 66px; width: 648px; height: 912px; transform-origin: 50% 87.9%; }
+  #moby img { width: 648px; height: 912px; display: block; }
 
   /* ---- Guess bubble (kit .kb-field / .kb-bar, drawn at 2x) ------ */
   .kb-field {
@@ -172,9 +173,9 @@ function clipTime(t) {
   if (t < 3.9) return 0.3 + t * (3.7 / 3.9);
   return Math.min(4.0 + (t - 3.9), 5.0);
 }
-// Frames 109–112 run off the edge of the source video (tail clipped), so hold 108 → jump to 113.
-const CLIPPED = { 109: 108, 110: 108, 111: 113, 112: 113 };
-const clipFrame = t => { const f = Math.min(CLIP_N, Math.floor(clipTime(t) * CLIP_FPS) + 1); return CLIPPED[f] || f; };
+// Frames 109–112 overshoot the source video's edges; key_moby.py redraws the
+// clipped outline, so every frame plays in order.
+const clipFrame = t => Math.min(CLIP_N, Math.floor(clipTime(t) * CLIP_FPS) + 1);
 const pad = n => String(n).padStart(4, '0');
 
 // ===== Frame renderer =====
