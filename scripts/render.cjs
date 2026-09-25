@@ -1,6 +1,7 @@
 // Render scene.html frame-by-frame with Playwright and encode with ffmpeg.
-//   node scripts/render.cjs                 → out/guess-mobys-game-10s.mp4
-//   node scripts/render.cjs --stills 0.9,2.6 → out/stills/*.png (quick previews)
+//   node scripts/render.cjs                      → out/guess-mobys-game-v1.mp4
+//   node scripts/render.cjs --variant alt2       → out/guess-mobys-game-alt2.mp4
+//   node scripts/render.cjs --stills 0.9,2.6     → out/stills/*.png (quick previews)
 const path = require('path');
 const fs = require('fs');
 const { spawn, execFileSync } = require('child_process');
@@ -10,14 +11,17 @@ try { playwright = require('playwright'); } catch { playwright = require('/opt/n
 const ROOT = path.resolve(__dirname, '..');
 const FFMPEG = process.env.FFMPEG ||
   execFileSync('python3', ['-c', 'import imageio_ffmpeg; print(imageio_ffmpeg.get_ffmpeg_exe())']).toString().trim();
-const OUT = path.join(ROOT, 'out', 'guess-mobys-game-10s.mp4');
+const argv = process.argv;
+const variantArg = argv.indexOf('--variant');
+const VARIANT = variantArg > -1 ? argv[variantArg + 1] : 'v1';
+const OUT = path.join(ROOT, 'out', `guess-mobys-game-${VARIANT}.mp4`);
 
 (async () => {
   const stillsArg = process.argv.indexOf('--stills');
   const browser = await playwright.chromium.launch({ args: ['--allow-file-access-from-files'] });
   const page = await browser.newPage({ viewport: { width: 1500, height: 1000 }, deviceScaleFactor: 1 });
   page.on('pageerror', e => console.error('page error:', e.message));
-  await page.goto('file://' + path.join(ROOT, 'scene.html'));
+  await page.goto('file://' + path.join(ROOT, 'scene.html') + '?v=' + VARIANT);
   await page.evaluate(() => window.ready);
   const stage = await page.$('#stage');
 
@@ -26,7 +30,7 @@ const OUT = path.join(ROOT, 'out', 'guess-mobys-game-10s.mp4');
     fs.mkdirSync(dir, { recursive: true });
     for (const s of process.argv[stillsArg + 1].split(',').map(Number)) {
       await page.evaluate(t => window.renderAt(t), s);
-      await stage.screenshot({ path: path.join(dir, `t${s.toFixed(2)}.png`) });
+      await stage.screenshot({ path: path.join(dir, `${VARIANT}-t${s.toFixed(2)}.png`) });
     }
     await browser.close();
     return;

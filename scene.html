@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Guess Moby's Game — 8s spot</title>
+<title>Guess Moby's Game spot</title>
 <style>
   /* Tokens lifted from gmg/colors_and_type.css (mode-1) + kit.css. */
   @font-face { font-family: "Fugaz One"; src: url("assets/fonts/FugazOne-Regular.ttf") format("truetype"); }
@@ -82,6 +82,53 @@
 
   #flash { background: #fff; opacity: 0; }
 
+  /* ---- Alt2: gameplay panel (Play screen + in-game keyboard, kit .kb-*) ---- */
+  #game { left: 60px; top: 36px; width: 700px; height: 928px; border-radius: 30px; overflow: hidden;
+    background: var(--base); border: 4px solid var(--base-secondary); box-shadow: 0 12px 0 0 var(--base-secondary);
+    display: flex; flex-direction: column; transform-origin: 50% 60%; }
+  .g-top { display: flex; align-items: center; gap: 14px; padding: 20px 24px 10px; }
+  .g-top img { width: 112px; display: block; }
+  .g-top .meta { font: 700 18px/1.3 var(--font-ui); color: #fff; }
+  .g-top .meta span { opacity: .8; font-weight: 600; }
+  .dots { margin-left: auto; display: flex; gap: 9px; }
+  .dots i { width: 22px; height: 22px; border-radius: 50%; border: 3px solid var(--base-secondary); background: rgba(255,255,255,.35); display: block; }
+  .dots i.on { background: var(--accent); }
+  .g-clue { display: flex; align-items: center; gap: 14px; padding: 6px 24px 14px; }
+  .g-clue .b { width: 46px; height: 46px; border-radius: 50%; background: var(--accent); border: 3px solid var(--base-secondary);
+    display: grid; place-items: center; font: 400 26px/1 var(--font-display); color: #fff; -webkit-text-stroke: 5px var(--base-secondary); paint-order: stroke fill; }
+  .g-clue .dt { font-size: 36px; -webkit-text-stroke-width: 7px; text-shadow: 0 6px 0 var(--base-secondary); }
+  .g-shot { position: relative; margin: 0 22px; background: #fff; border: 3px solid var(--base-secondary); border-radius: 16px;
+    box-shadow: 0 8px 1px 0 var(--base-secondary); padding: 8px; }
+  .g-shot .frame { position: relative; height: 272px; border-radius: 10px; overflow: hidden; background: #888; }
+  #adv { position: absolute; inset: -24px; width: calc(100% + 48px); height: calc(100% + 48px); image-rendering: pixelated; }
+  #game .kb-dock { margin-top: auto; background: var(--base); border-top: 3px solid var(--base-secondary); box-shadow: 0 -8px 0 0 var(--base-secondary); }
+  #game .kb-bar { display: flex; padding: 14px 18px; }
+  #game .kb-bar .kb-field { flex: 1; height: 68px; padding: 0 20px; border-width: 3px; border-radius: 16px; box-shadow: 0 5px 0 0 var(--base-secondary); font-size: 28px; }
+  #game .kb-bar .kb-field.is-open { outline-width: 5px; outline-offset: 3px; }
+  #game .kb-bar .kb-caret { width: 3px; }
+  .kb-tray { background: var(--kb-tray-bg); border-top: 3px solid var(--base-secondary); }
+  .kb-suggest { height: 58px; display: flex; align-items: center; gap: 10px; padding: 0 16px; }
+  .kb-hint { font: 600 18px/1 var(--font-ui); color: #fff; opacity: .85; white-space: nowrap; }
+  .kb-chip { padding: 7px 16px; border-radius: 9999px; border: 3px solid var(--base-secondary); background: #fff; color: var(--ink-dark);
+    box-shadow: 0 3px 0 var(--base-secondary); font: 700 20px/1.2 var(--font-ui); white-space: nowrap; }
+  .kb-keys { display: flex; flex-direction: column; gap: 9px; padding: 6px 8px 22px; }
+  .kb-row { display: flex; gap: 7px; }
+  .kb-pad { flex: 0.5 1 0; }
+  .kb-key { flex: 1 1 0; min-width: 0; height: 56px; margin-bottom: 4px; display: grid; place-items: center;
+    border: 3px solid var(--base-secondary); border-radius: 11px; background: #fff; color: var(--ink-dark);
+    box-shadow: 0 4px 0 var(--base-secondary); font: 700 26px/1 var(--font-ui); }
+  .kb-key--mod { flex-grow: 1.5; background: var(--kb-mod-bg); color: #fff; }
+  .kb-key--mod.is-on { background: #fff; color: var(--ink-dark); }
+  .kb-key--wide { flex-grow: 2.2; font-size: 21px; font-weight: 800; }
+  .kb-key--space { flex-grow: 5.6; font-size: 21px; color: color-mix(in srgb, var(--ink-dark) 55%, transparent); }
+  .kb-key--go { background: var(--accent); color: var(--base-secondary); }
+  .kb-key.is-down { transform: translateY(4px); box-shadow: 0 0 0 var(--base-secondary); background: var(--accent); color: var(--base-secondary); }
+  .kb-key svg { width: 1.15em; height: 1.15em; }
+  #correct2 { left: 110px; top: 128px; transform-origin: 20% 50%; display: inline-flex; align-items: center; gap: 16px;
+    padding: 14px 30px 14px 14px; border-radius: 9999px; background: var(--accent); border: 4px solid var(--base-secondary);
+    box-shadow: 0 8px 0 var(--base-secondary); font: 800 32px/1 var(--font-ui); color: var(--base-secondary); white-space: nowrap; }
+  #correct2 .tick { width: 54px; height: 54px; border-radius: 50%; background: #fff; border: 4px solid var(--base-secondary); display: grid; place-items: center; }
+
   /* ---- Scene C: game interface ---------------------------------- */
   #logo { left: 390px; top: 150px; width: 720px; transform-origin: 50% 60%; }
   #tag { left: 0; top: 720px; width: 1500px; display: flex; justify-content: center; gap: 0 22px; }
@@ -117,6 +164,30 @@
       <div class="btn" id="ansBtn">Guess</div>
     </div>
     <div id="correct" class="abs">
+      <span class="tick"><svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="rgb(0,91,111)" stroke-width="3.6" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg></span>
+      Got it on clue 1 · Pixel Perfect!
+    </div>
+
+    <!-- Alt2 only: the guess is typed in the game itself -->
+    <div id="game" class="abs">
+      <div class="g-top">
+        <img src="assets/logo-moby.png" alt="">
+        <div class="meta">#142 · r/retrogaming<br><span>4,812 guessing now</span></div>
+        <div class="dots"><i class="on"></i><i></i><i></i><i></i></div>
+      </div>
+      <div class="g-clue"><span class="b">1</span><span class="dt">A frame from the game</span></div>
+      <div class="g-shot"><div class="frame"><canvas id="adv" width="160" height="96"></canvas></div></div>
+      <div class="kb-dock">
+        <div class="kb-bar">
+          <div class="kb-field is-open" id="gField"><span id="gText"></span><span class="kb-caret" id="gCaret"></span><span class="kb-ph" id="gPh">Type your guess…</span></div>
+        </div>
+        <div class="kb-tray">
+          <div class="kb-suggest" id="gSuggest"><span class="kb-hint">Start typing a game title</span></div>
+          <div class="kb-keys" id="keys"></div>
+        </div>
+      </div>
+    </div>
+    <div id="correct2" class="abs">
       <span class="tick"><svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="rgb(0,91,111)" stroke-width="3.6" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg></span>
       Got it on clue 1 · Pixel Perfect!
     </div>
@@ -165,21 +236,37 @@ function pop(el, t, a, b = 99, extra = '') {
   set(el, o, `${extra} scale(${Math.max(0, s)})`);
 }
 
+// ===== Variant =====
+// v1   — the answer is typed into a guess bar next to Moby.
+// alt2 — the guess is typed on the in-game keyboard over a blurred screenshot clue.
+const VARIANT = new URLSearchParams(location.search).get('v') === 'alt2' ? 'alt2' : 'v1';
+
+// ===== Timeline =====
+// The hook (Moby thinking, bubble, clue chips) runs 0 → HOOK. The realization
+// beats below were authored on a local clock r, where "WAIT…" pops at r = 2.08;
+// r = t - SHIFT puts that just after the hook.
+const HOOK = 6.0;
+const SHIFT = HOOK - 2;
+const CUT = SHIFT + (VARIANT === 'alt2' ? 6.6 : 5.0);   // flash cut to the end card
+const DUR = CUT + 3.0, FPS = 60;
+
 // ===== Moby clip retime =====
-// Source is ~24.1fps, 121 frames. The thinking beat (0.3–4.0s) is stretched
-// over 0–3.9s, then the blink + "lights up" beat (4.0–5.02s) plays through.
+// Source is ~24.1fps, 121 frames. Thinking is frames 8–96; frames 72 and 96 are
+// near identical, so 73–96 is a seamless one-second idle loop, repeated to fill
+// the longer hook. Then the blink + "lights up" beat (97–121) plays through.
 const CLIP_FPS = 24.1, CLIP_N = 121;
-function clipTime(t) {
-  if (t < 3.9) return 0.3 + t * (3.7 / 3.9);
-  return Math.min(4.0 + (t - 3.9), 5.0);
+const range = (a, b) => Array.from({ length: b - a + 1 }, (_, k) => a + k);
+const THINK_SEQ = [...range(8, 96), ...range(73, 96), ...range(73, 96)];
+const THINK_END = HOOK - 0.1;
+function clipFrame(t) {
+  if (t < THINK_END) return THINK_SEQ[Math.min(THINK_SEQ.length - 1, Math.floor(t / THINK_END * THINK_SEQ.length))];
+  return Math.min(CLIP_N, 97 + Math.floor((t - THINK_END) * CLIP_FPS));
 }
 // Frames 109–112 overshoot the source video's edges; key_moby.py redraws the
 // clipped outline, so every frame plays in order.
-const clipFrame = t => Math.min(CLIP_N, Math.floor(clipTime(t) * CLIP_FPS) + 1);
 const pad = n => String(n).padStart(4, '0');
 
 // ===== Frame renderer =====
-const DUR = 10, FPS = 60;
 const mobyCache = {};
 async function preloadMoby() {
   // Decode sequentially — many parallel decodes can fail in headless Chromium.
@@ -198,6 +285,78 @@ function buildConfetti() {
     const d = document.createElement('div'); d.className = 'confetti'; d.style.background = CONF[i].col; $('confetti').appendChild(d); CONF[i].el = d;
   }
 }
+function renderConfetti(r, start, x, y) {
+  const ck = prog(r, start, start + 0.88);
+  CONF.forEach(c => {
+    const dx = Math.cos(c.a) * c.v * easeOut(ck), dy = Math.sin(c.a) * c.v * easeOut(ck) + 520 * ck * ck;
+    set(c.el, ck > 0 ? 1 - prog(r, start + 0.58, start + 0.88) : 0, `translate(${x + dx}px, ${y + dy}px) rotate(${c.rot * ck}deg) scaleX(${c.sx})`);
+  });
+}
+
+// ===== In-game keyboard (layout from gmg GuessKeyboard.jsx) =====
+const ICON = {
+  shift: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4 4 12h4.5v7h7v-7H20z"/></svg>',
+  back: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5h11v14H9l-6-7z"/><path d="m12 9 5 6m0-6-5 6"/></svg>',
+};
+const ROWS = [
+  ['q','w','e','r','t','y','u','i','o','p'],
+  ['{pad}','a','s','d','f','g','h','j','k','l','{pad}'],
+  ['{shift}','z','x','c','v','b','n','m','{back}'],
+  ['{mode}','{space}','{enter}'],
+];
+const keyEls = {};
+function buildKeys() {
+  for (const row of ROWS) {
+    const r = document.createElement('div'); r.className = 'kb-row';
+    for (const k of row) {
+      const el = document.createElement('span');
+      if (k === '{pad}') { el.className = 'kb-pad'; r.appendChild(el); continue; }
+      el.className = 'kb-key';
+      if (k === '{shift}') { el.classList.add('kb-key--mod'); el.innerHTML = ICON.shift; }
+      else if (k === '{back}') { el.classList.add('kb-key--mod'); el.innerHTML = ICON.back; }
+      else if (k === '{mode}') { el.classList.add('kb-key--mod', 'kb-key--wide'); el.textContent = '123'; }
+      else if (k === '{space}') { el.classList.add('kb-key--space'); el.textContent = 'space'; }
+      else if (k === '{enter}') { el.classList.add('kb-key--go', 'kb-key--wide'); el.textContent = 'Guess'; }
+      else el.textContent = k;
+      keyEls[k] = el; r.appendChild(el);
+    }
+    $('keys').appendChild(r);
+  }
+}
+
+// Screenshot clue: a drawn stand-in for Adventure's gold-castle room (Atari 2600,
+// 160-px-wide playfield). Drop a real frame at assets/adventure.png to use that instead.
+function drawAdventure() {
+  const c = $('adv'), g = c.getContext('2d');
+  const px = (x, y, w, h, col) => { g.fillStyle = col; g.fillRect(x, y, w, h); };
+  const bg = 'rgb(170,170,170)', gold = 'rgb(210,210,64)';
+  px(0, 0, 160, 96, bg);
+  // room walls with openings top and bottom
+  px(0, 0, 64, 6, gold); px(96, 0, 64, 6, gold);
+  px(0, 90, 64, 6, gold); px(96, 90, 64, 6, gold);
+  px(0, 0, 4, 96, gold); px(156, 0, 4, 96, gold);
+  // castle: two towers with battlements, keep, gate
+  const cx = 48, top = 14;
+  px(cx, top + 12, 64, 34, gold);                                  // keep
+  px(cx - 10, top, 20, 46, gold); px(cx + 54, top, 20, 46, gold);  // towers
+  for (let k = 0; k < 5; k++) { px(cx - 10 + k * 4, top - 4, 2, 4, gold); px(cx + 54 + k * 4, top - 4, 2, 4, gold); }
+  for (let k = 0; k < 8; k++) px(cx + 2 + k * 8, top + 8, 4, 4, gold);
+  px(cx + 22, top + 26, 20, 20, 'rgb(0,0,0)');                     // gate
+  for (let k = 0; k < 4; k++) px(cx + 24 + k * 5, top + 26, 1, 20, gold);
+  // the hero (a square) and the sword (arrow)
+  px(78, 66, 4, 4, gold);
+  px(28, 70, 12, 2, 'rgb(240,200,40)'); px(38, 68, 2, 6, 'rgb(240,200,40)'); px(40, 69, 2, 4, 'rgb(240,200,40)');
+  // a dragon lurking bottom-right
+  const dr = 'rgb(80,184,72)';
+  px(122, 58, 8, 6, dr); px(126, 64, 6, 14, dr); px(120, 78, 18, 4, dr); px(118, 82, 4, 6, dr); px(134, 82, 4, 6, dr); px(130, 60, 4, 2, 'rgb(0,0,0)');
+}
+async function maybeRealScreenshot() {
+  const im = new Image(); im.src = 'assets/adventure.png';
+  try { await im.decode(); } catch { return; }
+  const c = $('adv'), g = c.getContext('2d');
+  c.width = im.naturalWidth; c.height = im.naturalHeight; c.style.imageRendering = 'auto';
+  g.drawImage(im, 0, 0);
+}
 
 async function renderAt(t) {
   // Background loop (60fps, 480 frames) — wraps after 8s
@@ -205,26 +364,25 @@ async function renderAt(t) {
   const bg = $('bg'); const src = `build/bg/${pad(bf)}.jpg`;
   if (!bg.src.endsWith(src)) { bg.src = src; await bg.decode(); }
 
-  const inC = t >= 7.0;
+  const inC = t >= CUT;
   $('sceneAB').style.display = inC ? 'none' : 'block';
   $('sceneC').style.display = inC ? 'block' : 'none';
 
-  // Cut flash at 7.0
-  $('flash').style.opacity = t >= 6.93 && t < 7.2 ? (t < 7 ? prog(t, 6.93, 7) : 1 - prog(t, 7, 7.2)) * 0.9 : 0;
+  // Flash cut to the end card
+  $('flash').style.opacity = t >= CUT - 0.07 && t < CUT + 0.2 ? (t < CUT ? prog(t, CUT - 0.07, CUT) : 1 - prog(t, CUT, CUT + 0.2)) * 0.9 : 0;
 
-  if (!inC) renderAB(t); else renderC(t);
+  if (!inC) renderAB(t); else renderC(t - CUT);
 }
 
 function renderAB(t) {
-  const r = t - 2;   // realization/answer beats were authored at 2–5s; they now play at 4–7s
+  const r = t - SHIFT;
   // ---- Moby ----
   $('mobyImg').src = mobyCache[clipFrame(t)].src;
   const enter = easeOut(prog(t, 0, 0.45));
-  const lit = spring(prog(r, 2.35, 2.95));        // body "lights up" bounce
   const bob = r > 2.95 ? Math.sin((r - 2.95) * 5.2) * 8 : 0;
   // The thinking pose is drawn smaller than the lit-up pose in the source, so
-  // scale it up during the hook and ease back as the pose changes (~4.4s).
-  const hookScale = lerp(1.12, 1, easeInOut(prog(t, 4.15, 4.5)));
+  // scale it up during the hook and ease back as the pose changes.
+  const hookScale = lerp(1.12, 1, easeInOut(prog(t, HOOK + 0.15, HOOK + 0.5)));
   const sc = hookScale * lerp(0.94, 1, enter) * (1 + 0.07 * Math.sin(Math.PI * clamp(prog(r, 2.35, 2.75))));
   const tilt = r > 2.95 ? Math.sin((r - 2.95) * 5.2) * 1.6 : 0;
   set($('moby'), 1, `translate(${lerp(90, 0, enter)}px, ${bob}px) scale(${sc}) rotate(${tilt}deg)`);
@@ -234,20 +392,20 @@ function renderAB(t) {
   set($('glow'), g, `scale(${lerp(0.4, 1, easeOut(prog(r, 2.3, 2.7)))})`);
   set($('rays'), 0.9 * easeOut(prog(r, 2.3, 2.7)), `rotate(${t * 22}deg) scale(${lerp(0.5, 1, easeOut(prog(r, 2.3, 2.7)))})`);
 
-  // ---- Thought bubble: "Hmm… what game was that?" ----
-  const thinkIn = prog(t, 0.2, 0.75), thinkOut = prog(t, 3.9, 4.06);
+  // ---- Thought bubble: "Hmm… what game was that?" (types over ~2s) ----
+  const thinkIn = prog(t, 0.2, 0.75), thinkOut = prog(t, HOOK - 0.1, HOOK + 0.06);
   const ts = spring(thinkIn) * (1 - easeIn(thinkOut));
   set($('think'), clamp(thinkIn * 4) * (1 - thinkOut), `translateY(${Math.sin(t * 3) * 4}px) scale(${ts})`);
-  const n = Math.round(THINK_LINE.length * prog(t, 0.55, 2.1));
+  const n = Math.round(THINK_LINE.length * prog(t, 0.55, 2.55));
   $('thinkText').textContent = THINK_LINE.slice(0, n);
   $('thinkCaret').style.opacity = (n < THINK_LINE.length || Math.floor(t * 2) % 2 === 0) ? 1 : 0;
   $('p1').style.opacity = clamp(prog(t, 0.55, 0.7)); $('p2').style.opacity = clamp(prog(t, 0.7, 0.85));
 
-  // ---- Clue chips flash in, float, then scatter at the realization ----
-  [['chip1', 1.5], ['chip2', 2.15], ['chip3', 2.8]].forEach(([id, a], i) => {
+  // ---- Clue chips: one every ~0.9s, each on screen ≥ 2s, scatter at the realization ----
+  [['chip1', 2.3], ['chip2', 3.2], ['chip3', 4.1]].forEach(([id, a], i) => {
     const el = $(id);
     const fl = Math.sin(t * 3.4 + i * 2) * 6;
-    const out = prog(t, 3.92 + i * 0.03, 4.12 + i * 0.03);
+    const out = prog(t, HOOK - 0.08 + i * 0.03, HOOK + 0.12 + i * 0.03);
     const kin = prog(t, a, a + 0.5);
     const s = spring(kin);
     const flick = kin > 0 && kin < 0.2 ? 1.25 : 1;   // quick "flash" on arrival
@@ -257,10 +415,17 @@ function renderAB(t) {
 
   // ---- "WAIT… I GOT IT!" ----
   const shake = (a) => (r > a && r < a + 0.3 ? Math.sin((r - a) * 90) * 10 * (1 - prog(r, a, a + 0.3)) : 0);
-  pop($('wait'), r, 2.08, 99, `translateX(${shake(2.08)}px) rotate(-4deg)`);
-  pop($('gotit'), r, 2.4, 99, `translateX(${shake(2.4)}px) rotate(-3deg)`);
+  // alt2: the headline lifts away as the game slides in
+  const away = VARIANT === 'alt2' ? easeIn(prog(r, 3.0, 3.3)) : 0;
+  const lift = `translateY(${-away * 260}px)`;
+  pop($('wait'), r, 2.08, 99, `${lift} translateX(${shake(2.08)}px) rotate(-4deg)`);
+  pop($('gotit'), r, 2.4, 99, `${lift} translateX(${shake(2.4)}px) rotate(-3deg)`);
+  if (away) { $('wait').style.opacity *= 1 - away; $('gotit').style.opacity *= 1 - away; }
 
-  // ---- Answer reveal in the guess bar ----
+  if (VARIANT === 'alt2') { renderGame(r, t); set($('answer'), 0); set($('correct'), 0); return; }
+  set($('game'), 0); set($('correct2'), 0);
+
+  // ---- v1: answer revealed in the guess bar ----
   const barIn = easeOut(prog(r, 3.0, 3.3));
   set($('answer'), barIn, `translateY(${lerp(60, 0, barIn)}px)`);
   const an = Math.round(ANSWER.length * prog(r, 3.3, 3.95));
@@ -271,38 +436,76 @@ function renderAB(t) {
   const press = r >= 4.02 && r < 4.14;
   $('ansBtn').style.transform = press ? 'translateY(10px)' : 'none';
   $('ansBtn').style.boxShadow = press ? '0 0 0 0 var(--base-secondary)' : '';
-  // solved: the field pulses
   const solved = prog(r, 4.12, 4.5);
   $('ansField').style.borderColor = r >= 4.12 ? 'rgb(255,174,23)' : '';
   $('ansField').style.transform = r >= 4.12 ? `scale(${1 + 0.05 * Math.sin(Math.PI * solved)})` : 'none';
   pop($('correct'), r, 4.16, 99, 'rotate(-2deg)');
-
-  // confetti burst from the Guess button
-  const ck = prog(r, 4.12, 5.0);
-  CONF.forEach(c => {
-    const dx = Math.cos(c.a) * c.v * easeOut(ck), dy = Math.sin(c.a) * c.v * easeOut(ck) + 520 * ck * ck;
-    set(c.el, ck > 0 ? 1 - prog(r, 4.7, 5.0) : 0, `translate(${860 + dx}px, ${550 + dy}px) rotate(${c.rot * ck}deg) scaleX(${c.sx})`);
-  });
+  renderConfetti(r, 4.12, 860, 550);
 }
 
-function renderC(t) {
-  pop($('logo'), t, 7.1);
+// ---- alt2: the guess is typed in the game ----
+const TYPE_START = 3.95, TYPE_STEP = 0.15;
+const GUESS_AT = TYPE_START + (ANSWER.length - 1) * TYPE_STEP + 0.3;   // Guess key
+function renderGame(r, t) {
+  const inK = spring(prog(r, 3.05, 3.65), 2.2, 6);
+  set($('game'), clamp(prog(r, 3.05, 3.2)), `translateX(${lerp(-820, 0, inK)}px) rotate(${lerp(-5, 0, inK)}deg)`);
+
+  // key presses: shift (for the capital), then each letter, then Guess
+  let typed = 0, down = null;
+  [...ANSWER].forEach((ch, i) => {
+    const at = TYPE_START + i * TYPE_STEP;
+    if (r >= at) typed = i + 1;
+    if (r >= at - 0.07 && r < at + 0.04) down = ch.toLowerCase();
+  });
+  if (r >= TYPE_START - 0.3 && r < TYPE_START - 0.17) down = '{shift}';
+  if (r >= GUESS_AT - 0.08 && r < GUESS_AT + 0.06) down = '{enter}';
+  Object.entries(keyEls).forEach(([k, el]) => el.classList.toggle('is-down', k === down));
+  const shifted = typed === 0;
+  keyEls['{shift}'].classList.toggle('is-on', shifted);
+  Object.entries(keyEls).forEach(([k, el]) => { if (k.length === 1) el.textContent = shifted ? k.toUpperCase() : k; });
+
+  const solved = r >= GUESS_AT;
+  $('gText').textContent = ANSWER.slice(0, typed);
+  $('gPh').style.display = typed ? 'none' : 'inline';
+  $('gCaret').style.opacity = !solved && (Math.floor(t * 2.5) % 2 === 0 || (r > TYPE_START - 0.1 && r < GUESS_AT)) ? 1 : 0;
+  $('gField').classList.toggle('is-open', !solved);
+  $('gField').style.borderColor = solved ? 'rgb(255,174,23)' : '';
+  $('gField').style.transform = solved ? `scale(${1 + 0.04 * Math.sin(Math.PI * prog(r, GUESS_AT, GUESS_AT + 0.35))})` : 'none';
+
+  // suggestions strip, as in the game
+  const sug = $('gSuggest');
+  const want = typed >= 3 ? 'chip' : 'hint';
+  if (sug.dataset.state !== want) {
+    sug.innerHTML = want === 'chip' ? `<span class="kb-chip">${ANSWER}</span>` : '<span class="kb-hint">Start typing a game title</span>';
+    sug.dataset.state = want;
+  }
+
+  // the screenshot clue is blurred until the guess lands, then snaps into focus
+  const clear = easeOut(prog(r, GUESS_AT + 0.05, GUESS_AT + 0.55));
+  $('adv').style.filter = `blur(${lerp(9, 0, clear)}px) saturate(${lerp(0.85, 1, clear)})`;
+
+  pop($('correct2'), r, GUESS_AT + 0.25, 99, 'rotate(-2deg)');
+  renderConfetti(r, GUESS_AT + 0.05, 420, 300);
+}
+
+function renderC(lt) {
+  pop($('logo'), lt, 0.1);
   ['t1', 't2', 't3'].forEach((id, i) => {
-    const k = easeOut(prog(t, 7.75 + i * 0.3, 8.05 + i * 0.3));
+    const k = easeOut(prog(lt, 0.75 + i * 0.3, 1.05 + i * 0.3));
     set($(id), k, `translateY(${lerp(40, 0, k)}px) scale(${lerp(0.8, 1, back(k))})`);
   });
   // logo floats gently once it has landed (README wobble, scaled down)
-  if (t > 7.7) {
-    const lp = ((t - 7.7) % 2) / 2;
+  if (lt > 0.7) {
+    const lp = ((lt - 0.7) % 2) / 2;
     const rot = track(lp, [[0, 0], [0.175, -2], [0.425, 1.6], [0.675, -1.2], [1, 0]]);
     const my = track(lp, [[0, 0], [0.25, -8], [0.5, 2], [0.75, -5], [1, 0]]);
     $('logo').style.transform = `translateY(${my}px) rotate(${rot}deg)`;
   }
 }
 
-window.DUR = DUR; window.FPS = FPS; window.renderAt = renderAt;
+window.DUR = DUR; window.FPS = FPS; window.VARIANT = VARIANT; window.renderAt = renderAt;
 window.ready = (async () => {
-  buildConfetti();
+  buildConfetti(); buildKeys(); drawAdventure(); await maybeRealScreenshot();
   await document.fonts.load('40px "Fugaz One"'); await document.fonts.load('700 40px "Work Sans"'); await document.fonts.load('800 40px "Work Sans"');
   await preloadMoby();
   await renderAt(0);
