@@ -274,6 +274,7 @@ const IN_GAME = VARIANT !== 'v1';
 const TL = VARIANT === 'alt2' ? {
   hook: 4.0, bubbleType: [0.45, 1.9], chips: [1.6, 2.2, 2.8],
   lift: [2.75, 3.05], gameIn: [2.8, 3.35], typeStart: 3.45, typeStep: 0.12, guessGap: 0.25,
+  zoomIn: [3.15, 3.5], zoomOut: [4.75, 5.15],   // camera, on the r clock
   cutAt: 5.7, endCard: 2.3, tagStart: 0.55, tagStep: 0.22,
 } : VARIANT === 'v3' ? {
   // clue cards (t) instead of chips; keyboard opens at r = trayOpen
@@ -413,6 +414,22 @@ async function renderAt(t) {
   $('flash').style.opacity = t >= CUT - 0.07 && t < CUT + 0.2 ? (t < CUT ? prog(t, CUT - 0.07, CUT) : 1 - prog(t, CUT, CUT + 0.2)) * 0.9 : 0;
 
   if (!inC) renderAB(t); else renderC(t - CUT);
+  camera(inC ? 0 : zoomAmount(t - SHIFT));
+}
+
+// ---- alt2 camera: push in on the typing, pull back once the guess is in ----
+const ZOOM = { scale: 1.7, cx: 445, cy: 652 };   // stage point that fills the frame at full zoom
+function zoomAmount(r) {
+  if (VARIANT !== 'alt2') return 0;
+  const inK = easeInOut(prog(r, TL.zoomIn[0], TL.zoomIn[1]));
+  const outK = easeInOut(prog(r, TL.zoomOut[0], TL.zoomOut[1]));
+  return inK * (1 - outK);
+}
+function camera(k) {
+  const s = lerp(1, ZOOM.scale, k);
+  const cx = lerp(750, ZOOM.cx, k), cy = lerp(500, ZOOM.cy, k);
+  const tf = k > 0 ? `translate(${750 - cx * s}px, ${500 - cy * s}px) scale(${s})` : 'none';
+  for (const id of ['bg', 'sceneAB']) { $(id).style.transformOrigin = '0 0'; $(id).style.transform = tf; }
 }
 
 function renderAB(t) {
