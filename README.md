@@ -1,17 +1,18 @@
 # Guess Moby's Game spot
 
-Two cuts, both 1500×1000, 60fps, H.264, no audio:
+Three cuts, all 1500×1000, 60fps, H.264, no audio:
 
 - `out/guess-mobys-game-v1.mp4` (12s): the answer is typed into a guess bar beside Moby.
 - `out/guess-mobys-game-alt2.mp4` (10s): the guess is typed on the in-game keyboard over a blurred screenshot clue.
+- `out/guess-mobys-game-v3.mp4` (10s): mostly gameplay. The Play screen is up from the first frame, the clues arrive as in-game clue cards, and Moby thinks and solves beside it.
 
-| Beat | Version 1 (12s) | Alt 2 (10s) |
-|------|-----------------|-------------|
-| Hook | 0–6s. Moby thinks. "Hmm… what game was that?" types into the guess bubble, then the clue chips arrive one at a time: *Specific frame… / Released in… / That iconic detail…* | 0–4s. The same, at a quicker pace |
-| Realization | 6–9s. **WAIT… I GOT IT!** Moby lights up. *Adventure* is typed into the guess bar, Guess is pressed, then a "Pixel Perfect" badge and confetti | 4–7.7s. **WAIT… I GOT IT!**, then the Play screen slides in. *Adventure* is typed key by key on the in-game keyboard over a blurred frame; Guess brings the frame into focus and the badge lands |
-| End card | 9–12s. Flash cut to the logo, then *4 clues. 1 game. Can you guess it?* | 7.7–10s. The same |
+| Beat | Version 1 (12s) | Alt 2 (10s) | Version 3 (10s) |
+|------|-----------------|-------------|-----------------|
+| Hook | 0–6s. Moby thinks. "Hmm… what game was that?" types into the guess bubble, then the clue chips arrive one at a time: *Specific frame… / Released in… / That iconic detail…* | 0–4s. The same, at a quicker pace | 0–4s. In the game: a blurred frame, then clue cards for *Released in…* (1980 · Atari 2600) and *That iconic detail…* (the first video game Easter egg). Moby thinks beside it |
+| Realization | 6–9s. **WAIT… I GOT IT!** Moby lights up. *Adventure* is typed into the guess bar, Guess is pressed, then a "Pixel Perfect" badge and confetti | 4–7.7s. **WAIT… I GOT IT!**, then the Play screen slides in. *Adventure* is typed key by key on the in-game keyboard over a blurred frame; Guess brings the frame into focus and the badge lands | 4–7.7s. **WAIT… I GOT IT!**, the keyboard slides up over the clue cards, *Adventure* is typed and Guess brings the frame into focus |
+| End card | 9–12s. Flash cut to the logo, then *4 clues. 1 game. Can you guess it?* | 7.7–10s. The same | 7.7–10s. The same |
 
-The Adventure frame in Alt 2 is a drawn stand-in for the gold-castle room. Put a real screenshot at
+The Adventure frame in Alt 2 and Version 3 is a drawn stand-in for the gold-castle room. Put a real screenshot at
 `assets/adventure.png` and re-render to use it instead.
 
 Moby on his own: `out/moby-thinking-solving.gif` (415×640, transparent background, loops, about 5.8s including a 1s hold on the solved pose). Rebuild it with `python3 scripts/make_gif.py`.
@@ -29,6 +30,7 @@ pip install imageio-ffmpeg pillow numpy scipy
 bash scripts/prep.sh          # extracts frames and keys Moby off his white background
 node scripts/render.cjs                  # Version 1 → out/guess-mobys-game-v1.mp4
 node scripts/render.cjs --variant alt2   # Alt 2     → out/guess-mobys-game-alt2.mp4
+node scripts/render.cjs --variant v3     # Version 3 → out/guess-mobys-game-v3.mp4
 node scripts/render.cjs --variant alt2 --stills 1,4.6,7.3   # quick preview PNGs
 ```
 

@@ -107,6 +107,20 @@
   #game .kb-bar .kb-field.is-open { outline-width: 5px; outline-offset: 3px; }
   #game .kb-bar .kb-caret { width: 3px; }
   .kb-tray { background: var(--kb-tray-bg); border-top: 3px solid var(--base-secondary); }
+  /* v3: the whole opening happens in the game — clue cards stack under the frame,
+     the keyboard starts folded (field + Guess button) and slides up over them. */
+  .g-cards { display: flex; flex-direction: column; gap: 14px; padding: 18px 22px 0; }
+  .g-card { background: #fff; border: 3px solid var(--base-secondary); border-radius: 16px; box-shadow: 0 6px 1px 0 var(--base-secondary);
+    padding: 14px 20px 16px; display: flex; gap: 16px; align-items: center; transform-origin: 30% 50%; }
+  .g-card .b { width: 42px; height: 42px; flex: none; border-radius: 50%; background: var(--accent); border: 3px solid var(--base-secondary);
+    display: grid; place-items: center; font: 400 22px/1 var(--font-display); color: #fff; -webkit-text-stroke: 4px var(--base-secondary); paint-order: stroke fill; }
+  .g-card .lbl { font: 800 15px/1 var(--font-ui); color: var(--accent-secondary); text-transform: uppercase; letter-spacing: .08em; margin-bottom: 7px; }
+  .g-card .txt { font: 700 27px/1.2 var(--font-ui); color: var(--ink-dark); }
+  #game.v3 .g-shot .frame { height: 300px; }
+  #game.v3 .kb-dock { position: absolute; left: 0; right: 0; bottom: 0; margin: 0; }
+  #game.v3 .kb-tray-wrap { overflow: hidden; }
+  #game .kb-bar { gap: 14px; }
+  .g-guess { height: 68px; padding: 0 28px; border-width: 3px; border-radius: 16px; font-size: 26px; box-shadow: 0 6px 1px 0 var(--base-secondary); }
   .kb-suggest { height: 58px; display: flex; align-items: center; gap: 10px; padding: 0 16px; }
   .kb-hint { font: 600 18px/1 var(--font-ui); color: #fff; opacity: .85; white-space: nowrap; }
   .kb-chip { padding: 7px 16px; border-radius: 9999px; border: 3px solid var(--base-secondary); background: #fff; color: var(--ink-dark);
@@ -177,13 +191,20 @@
       </div>
       <div class="g-clue"><span class="b">1</span><span class="dt">A frame from the game</span></div>
       <div class="g-shot"><div class="frame"><canvas id="adv" width="160" height="96"></canvas></div></div>
+      <div class="g-cards" id="gCards">
+        <div class="g-card" id="card2"><span class="b">2</span><div><div class="lbl">Released in…</div><div class="txt">1980 · Atari 2600</div></div></div>
+        <div class="g-card" id="card3"><span class="b">3</span><div><div class="lbl">That iconic detail…</div><div class="txt">Home of the first video game Easter egg</div></div></div>
+      </div>
       <div class="kb-dock">
         <div class="kb-bar">
           <div class="kb-field is-open" id="gField"><span id="gText"></span><span class="kb-caret" id="gCaret"></span><span class="kb-ph" id="gPh">Type your guess…</span></div>
+          <div class="btn g-guess" id="gGuess">Guess</div>
         </div>
-        <div class="kb-tray">
-          <div class="kb-suggest" id="gSuggest"><span class="kb-hint">Start typing a game title</span></div>
-          <div class="kb-keys" id="keys"></div>
+        <div class="kb-tray-wrap" id="gTrayWrap">
+          <div class="kb-tray">
+            <div class="kb-suggest" id="gSuggest"><span class="kb-hint">Start typing a game title</span></div>
+            <div class="kb-keys" id="keys"></div>
+          </div>
         </div>
       </div>
     </div>
@@ -239,7 +260,10 @@ function pop(el, t, a, b = 99, extra = '') {
 // ===== Variant =====
 // v1   — the answer is typed into a guess bar next to Moby.
 // alt2 — the guess is typed on the in-game keyboard over a blurred screenshot clue.
-const VARIANT = new URLSearchParams(location.search).get('v') === 'alt2' ? 'alt2' : 'v1';
+// v3   — mostly gameplay: the Play screen is up from the first frame, the clues
+//        arrive as in-game clue cards, and Moby thinks and solves beside it.
+const VARIANT = ['alt2', 'v3'].includes(new URLSearchParams(location.search).get('v')) ? new URLSearchParams(location.search).get('v') : 'v1';
+const IN_GAME = VARIANT !== 'v1';
 
 // ===== Timeline =====
 // The hook (Moby thinking, bubble, clue chips) runs 0 → HOOK. The realization
@@ -249,6 +273,11 @@ const VARIANT = new URLSearchParams(location.search).get('v') === 'alt2' ? 'alt2
 const TL = VARIANT === 'alt2' ? {
   hook: 4.0, bubbleType: [0.45, 1.9], chips: [1.6, 2.2, 2.8],
   lift: [2.75, 3.05], gameIn: [2.8, 3.35], typeStart: 3.45, typeStep: 0.12, guessGap: 0.25,
+  cutAt: 5.7, endCard: 2.3, tagStart: 0.55, tagStep: 0.22,
+} : VARIANT === 'v3' ? {
+  // clue cards (t) instead of chips; keyboard opens at r = trayOpen
+  hook: 4.0, bubbleType: [0.5, 1.8], cards: [1.6, 2.6], trayOpen: [2.8, 3.1],
+  typeStart: 3.3, typeStep: 0.12, guessGap: 0.25,
   cutAt: 5.7, endCard: 2.3, tagStart: 0.55, tagStep: 0.22,
 } : {
   hook: 6.0, bubbleType: [0.55, 2.55], chips: [2.3, 3.2, 4.1],
@@ -396,17 +425,20 @@ function renderAB(t) {
   const hookScale = lerp(1.12, 1, easeInOut(prog(t, HOOK + 0.15, HOOK + 0.5)));
   const sc = hookScale * lerp(0.94, 1, enter) * (1 + 0.07 * Math.sin(Math.PI * clamp(prog(r, 2.35, 2.75))));
   const tilt = r > 2.95 ? Math.sin((r - 2.95) * 5.2) * 1.6 : 0;
-  set($('moby'), 1, `translate(${lerp(90, 0, enter)}px, ${bob}px) scale(${sc}) rotate(${tilt}deg)`);
+  const place = VARIANT === 'v3' ? 'translate(70px, 12px) scale(0.72) ' : '';
+  set($('moby'), 1, `${place}translate(${lerp(90, 0, enter)}px, ${bob}px) scale(${sc}) rotate(${tilt}deg)`);
 
   // glow + rays for the realization
   const g = easeOut(prog(r, 2.3, 2.6)) * (1 - 0.25 * (0.5 + 0.5 * Math.sin(t * 7)) * prog(r, 2.6, 3));
-  set($('glow'), g, `scale(${lerp(0.4, 1, easeOut(prog(r, 2.3, 2.7)))})`);
-  set($('rays'), 0.9 * easeOut(prog(r, 2.3, 2.7)), `rotate(${t * 22}deg) scale(${lerp(0.5, 1, easeOut(prog(r, 2.3, 2.7)))})`);
+  const gPlace = VARIANT === 'v3' ? 'translate(60px, 140px) scale(0.78) ' : '';
+  set($('glow'), g, `${gPlace}scale(${lerp(0.4, 1, easeOut(prog(r, 2.3, 2.7)))})`);
+  set($('rays'), 0.9 * easeOut(prog(r, 2.3, 2.7)), `${gPlace}rotate(${t * 22}deg) scale(${lerp(0.5, 1, easeOut(prog(r, 2.3, 2.7)))})`);
 
   // ---- Thought bubble: "Hmm… what game was that?" (types over ~2s) ----
   const thinkIn = prog(t, 0.2, 0.75), thinkOut = prog(t, HOOK - 0.1, HOOK + 0.06);
   const ts = spring(thinkIn) * (1 - easeIn(thinkOut));
-  set($('think'), clamp(thinkIn * 4) * (1 - thinkOut), `translateY(${Math.sin(t * 3) * 4}px) scale(${ts})`);
+  const tPlace = VARIANT === 'v3' ? 'translate(690px, -30px) scale(0.86) ' : '';
+  set($('think'), clamp(thinkIn * 4) * (1 - thinkOut), `${tPlace}translateY(${Math.sin(t * 3) * 4}px) scale(${ts})`);
   const n = Math.round(THINK_LINE.length * prog(t, TL.bubbleType[0], TL.bubbleType[1]));
   $('thinkText').textContent = THINK_LINE.slice(0, n);
   $('thinkCaret').style.opacity = (n < THINK_LINE.length || Math.floor(t * 2) % 2 === 0) ? 1 : 0;
@@ -414,6 +446,7 @@ function renderAB(t) {
 
   // ---- Clue chips: one every ~0.9s, each on screen ≥ 2s, scatter at the realization ----
   ['chip1', 'chip2', 'chip3'].forEach((id, i) => {
+    if (!TL.chips) { set($(id), 0); return; }
     const a = TL.chips[i];
     const el = $(id);
     const fl = Math.sin(t * 3.4 + i * 2) * 6;
@@ -430,11 +463,12 @@ function renderAB(t) {
   // alt2: the headline lifts away as the game slides in
   const away = VARIANT === 'alt2' ? easeIn(prog(r, TL.lift[0], TL.lift[1])) : 0;
   const lift = `translateY(${-away * 260}px)`;
-  pop($('wait'), r, 2.08, 99, `${lift} translateX(${shake(2.08)}px) rotate(-4deg)`);
-  pop($('gotit'), r, 2.4, 99, `${lift} translateX(${shake(2.4)}px) rotate(-3deg)`);
+  const hPlace = VARIANT === 'v3' ? 'translate(730px, -70px) scale(0.78) ' : '';
+  pop($('wait'), r, 2.08, 99, `${hPlace}${lift} translateX(${shake(2.08)}px) rotate(-4deg)`);
+  pop($('gotit'), r, 2.4, 99, `${hPlace}${lift} translateX(${shake(2.4)}px) rotate(-3deg)`);
   if (away) { $('wait').style.opacity *= 1 - away; $('gotit').style.opacity *= 1 - away; }
 
-  if (VARIANT === 'alt2') { renderGame(r, t); set($('answer'), 0); set($('correct'), 0); return; }
+  if (IN_GAME) { renderGame(r, t); set($('answer'), 0); set($('correct'), 0); return; }
   set($('game'), 0); set($('correct2'), 0);
 
   // ---- v1: answer revealed in the guess bar ----
@@ -459,8 +493,26 @@ function renderAB(t) {
 const TYPE_START = TL.typeStart, TYPE_STEP = TL.typeStep;
 const GUESS_AT = TYPE_START + (ANSWER.length - 1) * TYPE_STEP + TL.guessGap;   // Guess key
 function renderGame(r, t) {
-  const inK = spring(prog(r, TL.gameIn[0], TL.gameIn[1]), 2.2, 6);
-  set($('game'), clamp(prog(r, TL.gameIn[0], TL.gameIn[0] + 0.15)), `translateX(${lerp(-820, 0, inK)}px) rotate(${lerp(-5, 0, inK)}deg)`);
+  const t0 = VARIANT === 'v3' ? -SHIFT : TL.gameIn[0];            // v3: on screen from t = 0
+  const inK = spring(prog(r, t0, t0 + 0.55), 2.2, 6);
+  set($('game'), clamp(prog(r, t0, t0 + 0.15)), `translateX(${lerp(-820, 0, inK)}px) rotate(${lerp(-5, 0, inK)}deg)`);
+  $('game').classList.toggle('v3', VARIANT === 'v3');
+  const dots = $('game').querySelectorAll('.dots i');
+  if (VARIANT === 'v3') {
+    // clues 2 and 3 arrive as cards; the progress dots follow
+    [['card2', TL.cards[0]], ['card3', TL.cards[1]]].forEach(([id, a]) => pop($(id), t, a, 99, ''));
+    dots.forEach((d, i) => d.classList.toggle('on', i === 0 || (i === 1 && t >= TL.cards[0]) || (i === 2 && t >= TL.cards[1])));
+    // folded keyboard (field + Guess) until the field is tapped, then the tray slides up
+    const open = easeInOut(prog(r, TL.trayOpen[0], TL.trayOpen[1]));
+    const wrap = $('gTrayWrap');
+    wrap.style.height = (wrap.firstElementChild.offsetHeight * open) + 'px';
+    const folded = r < TL.trayOpen[0];
+    $('gGuess').style.display = folded ? 'grid' : 'none';
+    $('gField').classList.toggle('is-open', !folded && r < GUESS_AT);
+  } else {
+    $('gCards').style.display = 'none';
+    $('gGuess').style.display = 'none';
+  }
 
   // key presses: shift (for the capital), then each letter, then Guess
   let typed = 0, down = null;
@@ -479,8 +531,9 @@ function renderGame(r, t) {
   const solved = r >= GUESS_AT;
   $('gText').textContent = ANSWER.slice(0, typed);
   $('gPh').style.display = typed ? 'none' : 'inline';
-  $('gCaret').style.opacity = !solved && (Math.floor(t * 2.5) % 2 === 0 || (r > TYPE_START - 0.1 && r < GUESS_AT)) ? 1 : 0;
-  $('gField').classList.toggle('is-open', !solved);
+  const fieldLive = VARIANT !== 'v3' || r >= TL.trayOpen[0];
+  $('gCaret').style.opacity = fieldLive && !solved && (Math.floor(t * 2.5) % 2 === 0 || (r > TYPE_START - 0.1 && r < GUESS_AT)) ? 1 : 0;
+  if (VARIANT !== 'v3') $('gField').classList.toggle('is-open', !solved);
   $('gField').style.borderColor = solved ? 'rgb(255,174,23)' : '';
   $('gField').style.transform = solved ? `scale(${1 + 0.04 * Math.sin(Math.PI * prog(r, GUESS_AT, GUESS_AT + 0.35))})` : 'none';
 
