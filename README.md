@@ -4,6 +4,9 @@ Final render: `out/guess-mobys-game-10s.mp4` (1500×1000, 60fps, 10s, H.264, no 
 
 Moby on his own: `out/moby-thinking-solving.gif` (415×640, transparent background, loops, about 5.8s including a 1s hold on the solved pose). Rebuild it with `python3 scripts/make_gif.py`.
 
+A web-sized copy under 128KB: `out/moby-thinking-solving-128kb.gif` (156×240, about 8fps, 47 colours, 116KB). It needs [gifsicle](https://www.lcdf.org/gifsicle/):
+`python3 scripts/make_gif.py --height 240 --step 3 --colours 47 --lossy 40 --out out/moby-thinking-solving-128kb.gif`
+
 | Time | Beat |
 |------|------|
 | 0–4s | Moby thinks. A guess-bubble thought ("Hmm… what game was that?") types itself in, and the clue chips flash in: *Specific frame… / Released in… / That iconic detail…* |

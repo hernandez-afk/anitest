@@ -1,7 +1,9 @@
 """Build a transparent, looping GIF of Moby's thinking → solving animation.
 
 Uses the keyed frames in build/moby (run scripts/prep.sh first).
-  python3 scripts/make_gif.py            → out/moby-thinking-solving.gif
+  python3 scripts/make_gif.py                        → out/moby-thinking-solving.gif
+  python3 scripts/make_gif.py --height 240 --step 3 --colours 47 --lossy 40 \
+      --out out/moby-thinking-solving-128kb.gif     → the ≤128KB version
 """
 import glob
 import os
@@ -11,12 +13,21 @@ from PIL import Image
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 OUT = os.path.join(ROOT, 'out', 'moby-thinking-solving.gif')
-HEIGHT = 640          # output height in px
-STEP = 1              # 1 = every source frame (~24fps), 2 = ~12fps
-COLOURS = 127         # + 1 transparent slot
-HOLD_MS = 1000        # pause on the solved pose before looping
+import argparse
+ap = argparse.ArgumentParser()
+ap.add_argument('--height', type=int, default=640, help='output height in px')
+ap.add_argument('--step', type=int, default=1, help='1 = every source frame (~24fps), 2 = ~12fps, ...')
+ap.add_argument('--colours', type=int, default=127, help='palette size (+1 transparent slot)')
+ap.add_argument('--hold', type=int, default=1000, help='ms to pause on the solved pose before looping')
+ap.add_argument('--lossy', type=int, default=0, help='gifsicle --lossy level (0 = off); needs gifsicle installed')
+ap.add_argument('--out', default=OUT)
+args = ap.parse_args()
+HEIGHT, STEP, COLOURS, HOLD_MS, OUT = args.height, args.step, args.colours, args.hold, args.out
 
-paths = sorted(glob.glob(os.path.join(ROOT, 'build', 'moby', '*.png')))[::STEP]
+all_paths = sorted(glob.glob(os.path.join(ROOT, 'build', 'moby', '*.png')))
+paths = all_paths[::STEP]
+if paths[-1] != all_paths[-1]:
+    paths.append(all_paths[-1])   # always end on the solved pose
 frames = [Image.open(p).convert('RGBA') for p in paths]
 box = frames[0].getbbox()
 for f in frames[1:]:
@@ -49,4 +60,7 @@ durations = [round(1000 / fps)] * len(out)
 durations[-1] = HOLD_MS
 out[0].save(OUT, save_all=True, append_images=out[1:], duration=durations, loop=0,
             transparency=COLOURS, disposal=2, optimize=False)
-print(f'{OUT}: {len(out)} frames, {w}x{HEIGHT}, {os.path.getsize(OUT) / 1e6:.1f} MB')
+if args.lossy:
+    import subprocess
+    subprocess.run(['gifsicle', '-O3', f'--lossy={args.lossy}', '-b', OUT], check=True)
+print(f'{OUT}: {len(out)} frames, {w}x{HEIGHT}, {os.path.getsize(OUT) / 1024:.0f} KB')
