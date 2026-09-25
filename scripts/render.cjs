@@ -34,19 +34,12 @@ const OUT = path.join(ROOT, 'out', 'guess-mobys-game-10s.mp4');
 
   const { DUR, FPS } = await page.evaluate(() => ({ DUR: window.DUR, FPS: window.FPS }));
   const total = Math.round(DUR * FPS);
-  const src = path.join(ROOT, 'assets', 'moby-thinking.mp4');
-  // Moby's audio follows the same retime as the picture (0.3–4.0s stretched to 3.9s, then 4.0–5.02s).
+  // Video only — the spot ships without sound.
   const ff = spawn(FFMPEG, [
     '-loglevel', 'error', '-y',
     '-f', 'image2pipe', '-framerate', String(FPS), '-c:v', 'mjpeg', '-i', '-',
-    '-i', src,
-    '-filter_complex',
-    '[1:a]atrim=0.3:4.0,asetpts=PTS-STARTPTS,atempo=0.9487[a1];' +
-    '[1:a]atrim=4.0:5.02,asetpts=PTS-STARTPTS[a2];' +
-    '[a1][a2]concat=n=2:v=0:a=1,afade=t=in:d=0.15,afade=t=out:st=4.7:d=0.22,apad=whole_dur=10[a]',
-    '-map', '0:v', '-map', '[a]',
     '-c:v', 'libx264', '-preset', 'slow', '-crf', '16', '-pix_fmt', 'yuv420p', '-movflags', '+faststart',
-    '-c:a', 'aac', '-b:a', '160k', '-t', String(DUR),
+    '-an', '-t', String(DUR),
     OUT,
   ], { stdio: ['pipe', 'inherit', 'inherit'] });
 

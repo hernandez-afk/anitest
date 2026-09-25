@@ -1,6 +1,6 @@
 # Guess Moby's Game: 10-second spot
 
-Final render: `out/guess-mobys-game-10s.mp4` (1500×1000, 60fps, 10s, H.264 + AAC)
+Final render: `out/guess-mobys-game-10s.mp4` (1500×1000, 60fps, 10s, H.264, no audio)
 
 | Time | Beat |
 |------|------|
