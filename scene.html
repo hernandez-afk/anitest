@@ -437,7 +437,14 @@ function renderAB(t) {
   // ---- Thought bubble: "Hmm… what game was that?" (types over ~2s) ----
   const thinkIn = prog(t, 0.2, 0.75), thinkOut = prog(t, HOOK - 0.1, HOOK + 0.06);
   const ts = spring(thinkIn) * (1 - easeIn(thinkOut));
-  const tPlace = VARIANT === 'v3' ? 'translate(690px, -30px) scale(0.86) ' : '';
+  const tPlace = VARIANT === 'v3' ? 'translate(740px, -30px) scale(0.86) ' : '';
+  if (VARIANT === 'v3' && !$('think').dataset.left) {
+    // v3: the thought dots trail off the bubble's bottom-left, toward Moby below
+    $('think').dataset.left = '1';
+    $('think').style.transformOrigin = '8% 100%';
+    Object.assign($('p1').style, { right: 'auto', left: '-20px', bottom: '-34px' });
+    Object.assign($('p2').style, { right: 'auto', left: '-48px', bottom: '-70px' });
+  }
   set($('think'), clamp(thinkIn * 4) * (1 - thinkOut), `${tPlace}translateY(${Math.sin(t * 3) * 4}px) scale(${ts})`);
   const n = Math.round(THINK_LINE.length * prog(t, TL.bubbleType[0], TL.bubbleType[1]));
   $('thinkText').textContent = THINK_LINE.slice(0, n);
