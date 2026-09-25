@@ -245,10 +245,19 @@ const VARIANT = new URLSearchParams(location.search).get('v') === 'alt2' ? 'alt2
 // The hook (Moby thinking, bubble, clue chips) runs 0 → HOOK. The realization
 // beats below were authored on a local clock r, where "WAIT…" pops at r = 2.08;
 // r = t - SHIFT puts that just after the hook.
-const HOOK = 6.0;
+// v1 (12s) gives the hook 6s so every bubble can be read; alt2 is cut to 10s.
+const TL = VARIANT === 'alt2' ? {
+  hook: 4.0, bubbleType: [0.45, 1.9], chips: [1.6, 2.2, 2.8],
+  lift: [2.75, 3.05], gameIn: [2.8, 3.35], typeStart: 3.45, typeStep: 0.12, guessGap: 0.25,
+  cutAt: 5.7, endCard: 2.3, tagStart: 0.55, tagStep: 0.22,
+} : {
+  hook: 6.0, bubbleType: [0.55, 2.55], chips: [2.3, 3.2, 4.1],
+  cutAt: 5.0, endCard: 3.0, tagStart: 0.75, tagStep: 0.3,
+};
+const HOOK = TL.hook;
 const SHIFT = HOOK - 2;
-const CUT = SHIFT + (VARIANT === 'alt2' ? 6.6 : 5.0);   // flash cut to the end card
-const DUR = CUT + 3.0, FPS = 60;
+const CUT = SHIFT + TL.cutAt;   // flash cut to the end card
+const DUR = CUT + TL.endCard, FPS = 60;
 
 // ===== Moby clip retime =====
 // Source is ~24.1fps, 121 frames. Thinking is frames 8–96; frames 72 and 96 are
@@ -256,8 +265,10 @@ const DUR = CUT + 3.0, FPS = 60;
 // the longer hook. Then the blink + "lights up" beat (97–121) plays through.
 const CLIP_FPS = 24.1, CLIP_N = 121;
 const range = (a, b) => Array.from({ length: b - a + 1 }, (_, k) => a + k);
-const THINK_SEQ = [...range(8, 96), ...range(73, 96), ...range(73, 96)];
 const THINK_END = HOOK - 0.1;
+const LOOPS = Math.max(0, Math.round((THINK_END - 89 / CLIP_FPS) / (24 / CLIP_FPS)));
+const THINK_SEQ = [...range(8, 96)];
+for (let k = 0; k < LOOPS; k++) THINK_SEQ.push(...range(73, 96));
 function clipFrame(t) {
   if (t < THINK_END) return THINK_SEQ[Math.min(THINK_SEQ.length - 1, Math.floor(t / THINK_END * THINK_SEQ.length))];
   return Math.min(CLIP_N, 97 + Math.floor((t - THINK_END) * CLIP_FPS));
@@ -396,13 +407,14 @@ function renderAB(t) {
   const thinkIn = prog(t, 0.2, 0.75), thinkOut = prog(t, HOOK - 0.1, HOOK + 0.06);
   const ts = spring(thinkIn) * (1 - easeIn(thinkOut));
   set($('think'), clamp(thinkIn * 4) * (1 - thinkOut), `translateY(${Math.sin(t * 3) * 4}px) scale(${ts})`);
-  const n = Math.round(THINK_LINE.length * prog(t, 0.55, 2.55));
+  const n = Math.round(THINK_LINE.length * prog(t, TL.bubbleType[0], TL.bubbleType[1]));
   $('thinkText').textContent = THINK_LINE.slice(0, n);
   $('thinkCaret').style.opacity = (n < THINK_LINE.length || Math.floor(t * 2) % 2 === 0) ? 1 : 0;
   $('p1').style.opacity = clamp(prog(t, 0.55, 0.7)); $('p2').style.opacity = clamp(prog(t, 0.7, 0.85));
 
   // ---- Clue chips: one every ~0.9s, each on screen ≥ 2s, scatter at the realization ----
-  [['chip1', 2.3], ['chip2', 3.2], ['chip3', 4.1]].forEach(([id, a], i) => {
+  ['chip1', 'chip2', 'chip3'].forEach((id, i) => {
+    const a = TL.chips[i];
     const el = $(id);
     const fl = Math.sin(t * 3.4 + i * 2) * 6;
     const out = prog(t, HOOK - 0.08 + i * 0.03, HOOK + 0.12 + i * 0.03);
@@ -416,7 +428,7 @@ function renderAB(t) {
   // ---- "WAIT… I GOT IT!" ----
   const shake = (a) => (r > a && r < a + 0.3 ? Math.sin((r - a) * 90) * 10 * (1 - prog(r, a, a + 0.3)) : 0);
   // alt2: the headline lifts away as the game slides in
-  const away = VARIANT === 'alt2' ? easeIn(prog(r, 3.0, 3.3)) : 0;
+  const away = VARIANT === 'alt2' ? easeIn(prog(r, TL.lift[0], TL.lift[1])) : 0;
   const lift = `translateY(${-away * 260}px)`;
   pop($('wait'), r, 2.08, 99, `${lift} translateX(${shake(2.08)}px) rotate(-4deg)`);
   pop($('gotit'), r, 2.4, 99, `${lift} translateX(${shake(2.4)}px) rotate(-3deg)`);
@@ -444,11 +456,11 @@ function renderAB(t) {
 }
 
 // ---- alt2: the guess is typed in the game ----
-const TYPE_START = 3.95, TYPE_STEP = 0.15;
-const GUESS_AT = TYPE_START + (ANSWER.length - 1) * TYPE_STEP + 0.3;   // Guess key
+const TYPE_START = TL.typeStart, TYPE_STEP = TL.typeStep;
+const GUESS_AT = TYPE_START + (ANSWER.length - 1) * TYPE_STEP + TL.guessGap;   // Guess key
 function renderGame(r, t) {
-  const inK = spring(prog(r, 3.05, 3.65), 2.2, 6);
-  set($('game'), clamp(prog(r, 3.05, 3.2)), `translateX(${lerp(-820, 0, inK)}px) rotate(${lerp(-5, 0, inK)}deg)`);
+  const inK = spring(prog(r, TL.gameIn[0], TL.gameIn[1]), 2.2, 6);
+  set($('game'), clamp(prog(r, TL.gameIn[0], TL.gameIn[0] + 0.15)), `translateX(${lerp(-820, 0, inK)}px) rotate(${lerp(-5, 0, inK)}deg)`);
 
   // key presses: shift (for the capital), then each letter, then Guess
   let typed = 0, down = null;
@@ -491,7 +503,7 @@ function renderGame(r, t) {
 function renderC(lt) {
   pop($('logo'), lt, 0.1);
   ['t1', 't2', 't3'].forEach((id, i) => {
-    const k = easeOut(prog(lt, 0.75 + i * 0.3, 1.05 + i * 0.3));
+    const k = easeOut(prog(lt, TL.tagStart + i * TL.tagStep, TL.tagStart + 0.3 + i * TL.tagStep));
     set($(id), k, `translateY(${lerp(40, 0, k)}px) scale(${lerp(0.8, 1, back(k))})`);
   });
   // logo floats gently once it has landed (README wobble, scaled down)
