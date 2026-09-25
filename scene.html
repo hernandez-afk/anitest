@@ -417,8 +417,8 @@ async function renderAt(t) {
   camera(inC ? 0 : zoomAmount(t - SHIFT));
 }
 
-// ---- alt2 camera: push in on the typing, pull back once the guess is in ----
-const ZOOM = { scale: 1.7, cx: 445, cy: 652 };   // stage point that fills the frame at full zoom
+// ---- alt2 camera: push in close on the typed guess, pull back once it is in ----
+const ZOOM = { scale: 2.8, cx: 340, cy: 590 };   // stage point that fills the frame at full zoom
 function zoomAmount(r) {
   if (VARIANT !== 'alt2') return 0;
   const inK = easeInOut(prog(r, TL.zoomIn[0], TL.zoomIn[1]));
