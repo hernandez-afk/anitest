@@ -138,10 +138,11 @@
   .kb-key--go { background: var(--accent); color: var(--base-secondary); }
   .kb-key.is-down { transform: translateY(4px); box-shadow: 0 0 0 var(--base-secondary); background: var(--accent); color: var(--base-secondary); }
   .kb-key svg { width: 1.15em; height: 1.15em; }
-  #correct2 { left: 110px; top: 128px; transform-origin: 20% 50%; display: inline-flex; align-items: center; gap: 16px;
-    padding: 14px 30px 14px 14px; border-radius: 9999px; background: var(--accent); border: 4px solid var(--base-secondary);
-    box-shadow: 0 8px 0 var(--base-secondary); font: 800 32px/1 var(--font-ui); color: var(--base-secondary); white-space: nowrap; }
-  #correct2 .tick { width: 54px; height: 54px; border-radius: 50%; background: #fff; border: 4px solid var(--base-secondary); display: grid; place-items: center; }
+  /* sits in front of the lower half of the revealed screenshot */
+  #correct2 { left: 66px; top: 372px; transform-origin: 50% 50%; display: inline-flex; align-items: center; gap: 18px;
+    padding: 16px 34px 16px 16px; border-radius: 9999px; background: var(--accent); border: 5px solid var(--base-secondary);
+    box-shadow: 0 10px 0 var(--base-secondary); font: 800 37px/1 var(--font-ui); color: var(--base-secondary); white-space: nowrap; }
+  #correct2 .tick { width: 66px; height: 66px; border-radius: 50%; background: #fff; border: 4px solid var(--base-secondary); display: grid; place-items: center; }
 
   /* ---- Scene C: game interface ---------------------------------- */
   #logo { left: 390px; top: 150px; width: 720px; transform-origin: 50% 60%; }
@@ -186,7 +187,7 @@
     <div id="game" class="abs">
       <div class="g-top">
         <img src="assets/logo-moby.png" alt="">
-        <div class="meta">#142 · r/retrogaming<br><span>4,812 guessing now</span></div>
+        <div class="meta">#142 · r/mobygames<br><span>4,812 guessing now</span></div>
         <div class="dots"><i class="on"></i><i></i><i></i><i></i></div>
       </div>
       <div class="g-clue"><span class="b">1</span><span class="dt">A frame from the game</span></div>
@@ -439,11 +440,11 @@ function renderAB(t) {
   const ts = spring(thinkIn) * (1 - easeIn(thinkOut));
   const tPlace = VARIANT === 'v3' ? 'translate(740px, -30px) scale(0.86) ' : '';
   if (VARIANT === 'v3' && !$('think').dataset.left) {
-    // v3: the thought dots trail off the bubble's bottom-left, toward Moby below
+    // v3: the thought dots drop from the bubble's lower left and step down-right to Moby's head
     $('think').dataset.left = '1';
-    $('think').style.transformOrigin = '8% 100%';
-    Object.assign($('p1').style, { right: 'auto', left: '-20px', bottom: '-34px' });
-    Object.assign($('p2').style, { right: 'auto', left: '-48px', bottom: '-70px' });
+    $('think').style.transformOrigin = '20% 100%';
+    Object.assign($('p1').style, { right: 'auto', left: '120px', bottom: '-36px' });
+    Object.assign($('p2').style, { right: 'auto', left: '166px', bottom: '-74px' });
   }
   set($('think'), clamp(thinkIn * 4) * (1 - thinkOut), `${tPlace}translateY(${Math.sin(t * 3) * 4}px) scale(${ts})`);
   const n = Math.round(THINK_LINE.length * prog(t, TL.bubbleType[0], TL.bubbleType[1]));
@@ -557,7 +558,7 @@ function renderGame(r, t) {
   $('adv').style.filter = `blur(${lerp(9, 0, clear)}px) saturate(${lerp(0.85, 1, clear)})`;
 
   pop($('correct2'), r, GUESS_AT + 0.25, 99, 'rotate(-2deg)');
-  renderConfetti(r, GUESS_AT + 0.05, 420, 300);
+  renderConfetti(r, GUESS_AT + 0.05, 410, 420);
 }
 
 function renderC(lt) {
