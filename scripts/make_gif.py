@@ -2,8 +2,11 @@
 
 Uses the keyed frames in build/moby (run scripts/prep.sh first).
   python3 scripts/make_gif.py                        → out/moby-thinking-solving.gif
-  python3 scripts/make_gif.py --height 240 --step 3 --colours 47 --lossy 40 \
-      --out out/moby-thinking-solving-128kb.gif     → the ≤128KB version
+  python3 scripts/make_gif.py --height 240 --step 3 --colours 47 --lossy 40 --cut 73-96 \
+      --out out/moby-thinking-solving-128kb.gif     → the small web version
+
+--cut 73-96 drops one second of the thinking hold: frames 72 and 97 are near
+identical, so the join is seamless.
 """
 import glob
 import os
@@ -20,11 +23,15 @@ ap.add_argument('--step', type=int, default=1, help='1 = every source frame (~24
 ap.add_argument('--colours', type=int, default=127, help='palette size (+1 transparent slot)')
 ap.add_argument('--hold', type=int, default=1000, help='ms to pause on the solved pose before looping')
 ap.add_argument('--lossy', type=int, default=0, help='gifsicle --lossy level (0 = off); needs gifsicle installed')
+ap.add_argument('--cut', default='', help='drop a run of source frames, e.g. 73-96 (1-based, inclusive)')
 ap.add_argument('--out', default=OUT)
 args = ap.parse_args()
 HEIGHT, STEP, COLOURS, HOLD_MS, OUT = args.height, args.step, args.colours, args.hold, args.out
 
 all_paths = sorted(glob.glob(os.path.join(ROOT, 'build', 'moby', '*.png')))
+if args.cut:
+    lo, hi = (int(x) for x in args.cut.split('-'))
+    all_paths = all_paths[:lo - 1] + all_paths[hi:]
 paths = all_paths[::STEP]
 if paths[-1] != all_paths[-1]:
     paths.append(all_paths[-1])   # always end on the solved pose
