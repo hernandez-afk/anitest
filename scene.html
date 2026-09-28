@@ -94,7 +94,7 @@
   #clueCount .dots { margin: 0; gap: 10px; }
   #clueCount .dots i { width: 24px; height: 24px; }
   .qcard { position: absolute; width: 376px; height: 292px; background: #fff; border: 5px solid var(--base-secondary); border-radius: 22px;
-    box-shadow: 0 9px 0 var(--base-secondary); overflow: hidden; display: flex; flex-direction: column; transform-origin: 0% 50%; }
+    box-shadow: 0 9px 0 var(--base-secondary); overflow: hidden; display: flex; flex-direction: column; transform-origin: 50% 60%; }
   .qhead { flex: none; height: 66px; display: flex; align-items: center; gap: 12px; padding: 0 18px; background: var(--accent);
     border-bottom: 4px solid var(--base-secondary); font: 800 30px/1 var(--font-ui); color: var(--base-secondary); letter-spacing: .06em; text-transform: uppercase; }
   .qhead svg { width: 38px; height: 38px; flex: none; }
@@ -579,12 +579,15 @@ function renderClueCards(t) {
   $('clueCount').querySelectorAll('i').forEach((d, i) => d.classList.toggle('on', i < shown));
   TL.clueAt.forEach((a, i) => {
     const el = $('q' + (i + 1));
-    const k = spring(prog(t, a, a + 0.55), 2.4, 6);
+    // soft entrance: fade + rise + settle, no bounce
+    const k = easeOut(prog(t, a, a + 0.4));
     const out = prog(t, outAt + i * 0.03, outAt + 0.18 + i * 0.03);
-    const flip = lerp(-88, 0, clamp(k, 0, 1.2));
-    set(el, clamp(prog(t, a, a + 0.08)) * (1 - out),
-      `perspective(1100px) rotateY(${flip}deg) scale(${lerp(0.9, 1, clamp(k)) * (1 - 0.3 * easeIn(out))}) translateY(${Math.sin(t * 3 + i) * 3}px)`);
-    el.querySelector('.qflash').style.opacity = t >= a ? 0.85 * (1 - prog(t, a + 0.12, a + 0.5)) : 0;
+    set(el, k * (1 - out),
+      `translateY(${lerp(24, 0, k) + Math.sin(t * 3 + i) * 3}px) scale(${lerp(0.96, 1, k) * (1 - 0.3 * easeIn(out))})`);
+    // the header warms up briefly as the clue arrives
+    const glow = t >= a ? 1 - prog(t, a + 0.1, a + 0.7) : 0;
+    el.querySelector('.qhead').style.boxShadow = `inset 0 0 0 200px rgba(255,236,170,${0.55 * glow})`;
+    el.querySelector('.qflash').style.opacity = 0;
   });
 }
 
