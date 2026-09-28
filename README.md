@@ -5,7 +5,7 @@ Four cuts, all 1500×1000, 60fps, H.264, no audio:
 - `out/guess-mobys-game-v1.mp4` (12s): the answer is typed into a guess bar beside Moby.
 - `out/guess-mobys-game-alt2.mp4` (10s): the guess is typed on the in-game keyboard over a blurred screenshot clue.
 - `out/guess-mobys-game-v3.mp4` (10s): mostly gameplay. The Play screen is up from the first frame, the clues arrive as in-game clue cards, and Moby thinks and solves beside it.
-- `out/guess-mobys-game-v4.mp4` (11s): Alt 2 with clearer clues. Four game-style clue cards fade up one by one over 5s with a "Clue n of 4" counter. Each card leads with a big "Clue 1–4" header and icon; the contents are filler (a blurred screenshot, placeholder bars, blank letter slots) so the eye counts four clues without reading them. Then the in-game typing with the close-up, ending on "Got it on clue 4!".
+- `out/guess-mobys-game-v4.mp4` (11s): Alt 2 with clearer clues. Four game-style clue cards fade up one by one over 5s with a "Clue n of 4" counter. Each card leads with a big "Clue 1–4" header and icon; each holds one glanceable item (a blurred screenshot, *1980*, an Easter egg, the first letter *A*) so the eye counts four clues without having to read. Then the in-game typing with the close-up, ending on "Got it on clue 4!".
 
 | Beat | Version 1 (12s) | Alt 2 (10s) | Version 3 (10s) |
 |------|-----------------|-------------|-----------------|
