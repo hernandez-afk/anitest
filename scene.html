@@ -57,7 +57,10 @@
   .chip { display: inline-flex; align-items: center; gap: 18px; padding: 12px 34px 12px 12px;
     border-radius: 9999px; border: 4px solid var(--base-secondary); background: #fff; color: var(--ink-dark);
     box-shadow: 0 5px 0 var(--base-secondary); font: 700 46px/1 var(--font-ui); white-space: nowrap; transform-origin: 20% 50%; }
-  .chip .cl { display: flex; flex-direction: column; gap: 7px; }
+  .chip .cl { display: flex; flex-direction: column; gap: 9px; }
+  .chip.big { font-size: 54px; gap: 20px; padding: 14px 40px 16px 14px; border-width: 5px; box-shadow: 0 7px 0 var(--base-secondary); }
+  .chip.big .badge { width: 84px; height: 84px; font-size: 46px; -webkit-text-stroke-width: 6px; border-width: 5px; }
+  .chip.big .cl small { font-size: 26px; }
   .chip .cl small { font: 800 22px/1 var(--font-ui); color: var(--accent-secondary); text-transform: uppercase; letter-spacing: .12em; }
   .badge { width: 70px; height: 70px; border-radius: 50%; background: var(--accent); border: 4px solid var(--base-secondary);
     display: grid; place-items: center; font: 400 38px/1 var(--font-display); color: #fff;
@@ -112,13 +115,13 @@
   /* v3: the whole opening happens in the game — clue cards stack under the frame,
      the keyboard starts folded (field + Guess button) and slides up over them. */
   .g-cards { display: flex; flex-direction: column; gap: 14px; padding: 18px 22px 0; }
-  .g-card { background: #fff; border: 3px solid var(--base-secondary); border-radius: 16px; box-shadow: 0 6px 1px 0 var(--base-secondary);
+  .g-card { background: #fff; border: 4px solid var(--base-secondary); border-radius: 18px; box-shadow: 0 6px 1px 0 var(--base-secondary);
     padding: 14px 20px 16px; display: flex; gap: 16px; align-items: center; transform-origin: 30% 50%; }
-  .g-card .b { width: 42px; height: 42px; flex: none; border-radius: 50%; background: var(--accent); border: 3px solid var(--base-secondary);
-    display: grid; place-items: center; font: 400 22px/1 var(--font-display); color: #fff; -webkit-text-stroke: 4px var(--base-secondary); paint-order: stroke fill; }
-  .g-card .lbl { font: 800 15px/1 var(--font-ui); color: var(--accent-secondary); text-transform: uppercase; letter-spacing: .08em; margin-bottom: 7px; }
-  .g-card .txt { font: 700 27px/1.2 var(--font-ui); color: var(--ink-dark); }
-  #game.v3 .g-shot .frame { height: 300px; }
+  .g-card .b { width: 58px; height: 58px; flex: none; border-radius: 50%; background: var(--accent); border: 4px solid var(--base-secondary);
+    display: grid; place-items: center; font: 400 31px/1 var(--font-display); color: #fff; -webkit-text-stroke: 5px var(--base-secondary); paint-order: stroke fill; }
+  .g-card .lbl { font: 800 21px/1 var(--font-ui); color: var(--accent-secondary); text-transform: uppercase; letter-spacing: .08em; margin-bottom: 8px; }
+  .g-card .txt { font: 700 35px/1.15 var(--font-ui); color: var(--ink-dark); }
+  #game.v3 .g-shot .frame { height: 262px; }
   #game.v3 .kb-dock { position: absolute; left: 0; right: 0; bottom: 0; margin: 0; }
   #game.v3 .kb-tray-wrap { overflow: hidden; }
   #game .kb-bar { gap: 14px; }
@@ -195,8 +198,8 @@
       <div class="g-clue"><span class="b">1</span><span class="dt">A screenshot from the game</span></div>
       <div class="g-shot"><div class="frame"><canvas id="adv" width="160" height="96"></canvas></div></div>
       <div class="g-cards" id="gCards">
-        <div class="g-card" id="card2"><span class="b">2</span><div><div class="lbl">Released in…</div><div class="txt">1980 · Atari 2600</div></div></div>
-        <div class="g-card" id="card3"><span class="b">3</span><div><div class="lbl">An iconic game detail…</div><div class="txt">Home of the first video game Easter egg</div></div></div>
+        <div class="g-card" id="card2"><span class="b">2</span><div><div class="lbl">Clue 2 · Released in…</div><div class="txt">1980 · Atari 2600</div></div></div>
+        <div class="g-card" id="card3"><span class="b">3</span><div><div class="lbl">Clue 3 · An iconic game detail…</div><div class="txt">Home of the first video game Easter egg</div></div></div>
       </div>
       <div class="kb-dock">
         <div class="kb-bar">
@@ -270,11 +273,14 @@ const IN_GAME = VARIANT !== 'v1';
 
 // alt2 copy: the hook reads as active guessing, and the chips are labelled as clues
 const ALT2_CHIPS = ['Specific screenshot…', 'Released in…', 'An iconic game detail…'];
-if (VARIANT === 'alt2') THINK_LINE = 'Hmm…\nwhat game is this?';
+if (VARIANT !== 'v1') THINK_LINE = 'Hmm…\nwhat game is this?';
 function labelChips() {
   if (VARIANT !== 'alt2') return;
   ALT2_CHIPS.forEach((txt, i) => {
-    $('chip' + (i + 1)).innerHTML = `<span class="badge">${i + 1}</span><span class="cl"><small>Clue ${i + 1}</small>${txt}</span>`;
+    const el = $('chip' + (i + 1));
+    el.innerHTML = `<span class="badge">${i + 1}</span><span class="cl"><small>Clue ${i + 1}</small>${txt}</span>`;
+    el.classList.add('big');
+    Object.assign(el.style, [{ left: '24px', top: '338px' }, { left: '120px', top: '494px' }, { left: '24px', top: '650px' }][i]);
   });
 }
 
