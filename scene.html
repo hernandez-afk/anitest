@@ -57,6 +57,8 @@
   .chip { display: inline-flex; align-items: center; gap: 18px; padding: 12px 34px 12px 12px;
     border-radius: 9999px; border: 4px solid var(--base-secondary); background: #fff; color: var(--ink-dark);
     box-shadow: 0 5px 0 var(--base-secondary); font: 700 46px/1 var(--font-ui); white-space: nowrap; transform-origin: 20% 50%; }
+  .chip .cl { display: flex; flex-direction: column; gap: 7px; }
+  .chip .cl small { font: 800 22px/1 var(--font-ui); color: var(--accent-secondary); text-transform: uppercase; letter-spacing: .12em; }
   .badge { width: 70px; height: 70px; border-radius: 50%; background: var(--accent); border: 4px solid var(--base-secondary);
     display: grid; place-items: center; font: 400 38px/1 var(--font-display); color: #fff;
     -webkit-text-stroke: 5px var(--base-secondary); paint-order: stroke fill; flex: none; }
@@ -190,11 +192,11 @@
         <div class="meta">#142 · r/mobygames<br><span>4,812 guessing now</span></div>
         <div class="dots"><i class="on"></i><i></i><i></i><i></i></div>
       </div>
-      <div class="g-clue"><span class="b">1</span><span class="dt">A frame from the game</span></div>
+      <div class="g-clue"><span class="b">1</span><span class="dt">A screenshot from the game</span></div>
       <div class="g-shot"><div class="frame"><canvas id="adv" width="160" height="96"></canvas></div></div>
       <div class="g-cards" id="gCards">
         <div class="g-card" id="card2"><span class="b">2</span><div><div class="lbl">Released in…</div><div class="txt">1980 · Atari 2600</div></div></div>
-        <div class="g-card" id="card3"><span class="b">3</span><div><div class="lbl">That iconic detail…</div><div class="txt">Home of the first video game Easter egg</div></div></div>
+        <div class="g-card" id="card3"><span class="b">3</span><div><div class="lbl">An iconic game detail…</div><div class="txt">Home of the first video game Easter egg</div></div></div>
       </div>
       <div class="kb-dock">
         <div class="kb-bar">
@@ -227,7 +229,7 @@
 
 <script>
 // ===== Content (swap the answer here) =====
-const THINK_LINE = 'Hmm…\nwhat game was that?';
+let THINK_LINE = 'Hmm…\nwhat game was that?';
 const ANSWER = 'Adventure';
 
 // ===== Timing helpers =====
@@ -265,6 +267,16 @@ function pop(el, t, a, b = 99, extra = '') {
 //        arrive as in-game clue cards, and Moby thinks and solves beside it.
 const VARIANT = ['alt2', 'v3'].includes(new URLSearchParams(location.search).get('v')) ? new URLSearchParams(location.search).get('v') : 'v1';
 const IN_GAME = VARIANT !== 'v1';
+
+// alt2 copy: the hook reads as active guessing, and the chips are labelled as clues
+const ALT2_CHIPS = ['Specific screenshot…', 'Released in…', 'An iconic game detail…'];
+if (VARIANT === 'alt2') THINK_LINE = 'Hmm…\nwhat game is this?';
+function labelChips() {
+  if (VARIANT !== 'alt2') return;
+  ALT2_CHIPS.forEach((txt, i) => {
+    $('chip' + (i + 1)).innerHTML = `<span class="badge">${i + 1}</span><span class="cl"><small>Clue ${i + 1}</small>${txt}</span>`;
+  });
+}
 
 // ===== Timeline =====
 // The hook (Moby thinking, bubble, clue chips) runs 0 → HOOK. The realization
@@ -596,7 +608,7 @@ function renderC(lt) {
 
 window.DUR = DUR; window.FPS = FPS; window.VARIANT = VARIANT; window.renderAt = renderAt;
 window.ready = (async () => {
-  buildConfetti(); buildKeys(); drawAdventure(); await maybeRealScreenshot();
+  labelChips(); buildConfetti(); buildKeys(); drawAdventure(); await maybeRealScreenshot();
   await document.fonts.load('40px "Fugaz One"'); await document.fonts.load('700 40px "Work Sans"'); await document.fonts.load('800 40px "Work Sans"');
   await preloadMoby();
   await renderAt(0);
