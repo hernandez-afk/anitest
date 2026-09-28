@@ -88,7 +88,7 @@
   #flash { background: #fff; opacity: 0; }
 
   /* ---- v4: game-style clue cards with real content ---------------- */
-  #clueCount { left: 24px; top: 284px; display: inline-flex; align-items: center; gap: 18px; padding: 11px 24px;
+  #clueCount { left: 24px; top: 302px; display: inline-flex; align-items: center; gap: 18px; padding: 11px 24px;
     border-radius: 9999px; background: var(--base-secondary); color: #fff; font: 800 27px/1 var(--font-ui);
     letter-spacing: .06em; text-transform: uppercase; box-shadow: 0 5px 0 rgba(0,40,55,.5); font-size: 31px; }
   #clueCount .dots { margin: 0; gap: 10px; }
@@ -221,10 +221,10 @@
 
     <!-- v4 only: the clues as the game's own clue cards -->
     <div id="clueCount" class="abs"><span id="clueCountText">Clue 1 of 4</span><span class="dots"><i></i><i></i><i></i><i></i></span></div>
-    <div class="qcard" id="q1" style="left:24px; top:356px"><div class="qhead"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linejoin="round"><path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.6"/></svg>Clue 1</div><div class="qthumb"><canvas id="advThumb" width="160" height="96"></canvas></div><div class="qflash"></div></div>
-    <div class="qcard" id="q2" style="left:416px; top:356px"><div class="qhead"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linejoin="round" stroke-linecap="round"><rect x="3.5" y="5" width="17" height="15" rx="2"/><path d="M3.5 10h17M8 3v4M16 3v4"/></svg>Clue 2</div><div class="qbody"><span class="qlbl">Released</span><span class="qbig">1980</span></div><div class="qflash"></div></div>
-    <div class="qcard" id="q3" style="left:24px; top:666px"><div class="qhead"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linejoin="round"><path d="m12 3 2.7 5.6 6.1.8-4.5 4.2 1.1 6.1L12 16.8 6.6 19.7l1.1-6.1-4.5-4.2 6.1-.8z"/></svg>Clue 3</div><div class="qbody qrow"><svg class="qegg" viewBox="0 0 60 76"><path d="M30 3C15 3 4 28 4 46c0 16 12 27 26 27s26-11 26-27C56 28 45 3 30 3z" fill="#fff" stroke="rgb(0,91,111)" stroke-width="5"/><path d="M8 44l9-7 9 8 9-8 9 8 8-7" fill="none" stroke="rgb(255,174,23)" stroke-width="6" stroke-linejoin="round"/><circle cx="21" cy="57" r="4" fill="rgb(0,116,200)"/><circle cx="39" cy="60" r="4" fill="rgb(0,116,200)"/><circle cx="30" cy="24" r="4" fill="rgb(0,116,200)"/></svg><div class="qcol"><span class="qlbl">Iconic detail</span><span class="qfact">First<br>Easter egg</span></div></div><div class="qflash"></div></div>
-    <div class="qcard" id="q4" style="left:416px; top:666px"><div class="qhead"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linejoin="round" stroke-linecap="round"><path d="M3 18 7.5 6 12 18M4.8 13.5h5.4M14 18h7"/></svg>Clue 4</div><div class="qbody"><span class="qlbl">First letter</span><span class="qletters"><b class="on">A</b><b></b><b></b><b></b><b></b><b></b><b></b><b></b><b></b></span></div><div class="qflash"></div></div>
+    <div class="qcard" id="q1" style="left:24px; top:370px"><div class="qhead"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linejoin="round"><path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.6"/></svg>Clue 1</div><div class="qthumb"><canvas id="advThumb" width="160" height="96"></canvas></div><div class="qflash"></div></div>
+    <div class="qcard" id="q2" style="left:416px; top:370px"><div class="qhead"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linejoin="round" stroke-linecap="round"><rect x="3.5" y="5" width="17" height="15" rx="2"/><path d="M3.5 10h17M8 3v4M16 3v4"/></svg>Clue 2</div><div class="qbody"><span class="qlbl">Released</span><span class="qbig">1980</span></div><div class="qflash"></div></div>
+    <div class="qcard" id="q3" style="left:24px; top:674px"><div class="qhead"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linejoin="round"><path d="m12 3 2.7 5.6 6.1.8-4.5 4.2 1.1 6.1L12 16.8 6.6 19.7l1.1-6.1-4.5-4.2 6.1-.8z"/></svg>Clue 3</div><div class="qbody qrow"><svg class="qegg" viewBox="0 0 60 76"><path d="M30 3C15 3 4 28 4 46c0 16 12 27 26 27s26-11 26-27C56 28 45 3 30 3z" fill="#fff" stroke="rgb(0,91,111)" stroke-width="5"/><path d="M8 44l9-7 9 8 9-8 9 8 8-7" fill="none" stroke="rgb(255,174,23)" stroke-width="6" stroke-linejoin="round"/><circle cx="21" cy="57" r="4" fill="rgb(0,116,200)"/><circle cx="39" cy="60" r="4" fill="rgb(0,116,200)"/><circle cx="30" cy="24" r="4" fill="rgb(0,116,200)"/></svg><div class="qcol"><span class="qlbl">Iconic detail</span><span class="qfact">First<br>Easter egg</span></div></div><div class="qflash"></div></div>
+    <div class="qcard" id="q4" style="left:416px; top:674px"><div class="qhead"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linejoin="round" stroke-linecap="round"><path d="M3 18 7.5 6 12 18M4.8 13.5h5.4M14 18h7"/></svg>Clue 4</div><div class="qbody"><span class="qlbl">First letter</span><span class="qletters"><b class="on">A</b><b></b><b></b><b></b><b></b><b></b><b></b><b></b><b></b></span></div><div class="qflash"></div></div>
 
     <!-- Alt2 only: the guess is typed in the game itself -->
     <div id="game" class="abs">
@@ -583,7 +583,9 @@ function renderAB(t) {
 function renderClueCards(t) {
   const on = VARIANT === 'v4';
   const outAt = HOOK - 0.1;
-  set($('clueCount'), on ? clamp(prog(t, TL.clueAt?.[0] - 0.1, TL.clueAt?.[0] + 0.15)) * (1 - prog(t, outAt, outAt + 0.16)) : 0);
+  // the counter floats in step with the thought bubble above it, so the gap between them holds
+  set($('clueCount'), on ? clamp(prog(t, TL.clueAt?.[0] - 0.1, TL.clueAt?.[0] + 0.15)) * (1 - prog(t, outAt, outAt + 0.16)) : 0,
+      `translateY(${Math.sin(t * 3) * 4}px)`);
   if (!on) { ['q1', 'q2', 'q3', 'q4'].forEach(id => set($(id), 0)); return; }
   const shown = TL.clueAt.filter(a => t >= a).length;
   $('clueCountText').textContent = `Clue ${Math.max(1, shown)} of 4`;
