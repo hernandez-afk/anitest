@@ -108,7 +108,7 @@
   .qcol { display: flex; flex-direction: column; gap: 10px; }
   .qegg { width: 70px; height: 88px; flex: none; }
   .qword { font: 400 44px/1 var(--font-display); color: var(--base-secondary); white-space: nowrap; }
-  .qfact { font: 800 29px/1.12 var(--font-ui); color: var(--base-secondary); }
+  .qfact { font: 400 40px/1.02 var(--font-display); color: var(--base-secondary); }
   .qtxt { font: 800 34px/1.12 var(--font-ui); }
   .qletters { display: flex; gap: 7px; margin-top: 6px; }
   .qletters b.on { border-bottom-color: var(--base-secondary); }
@@ -223,7 +223,7 @@
     <div id="clueCount" class="abs"><span id="clueCountText">Clue 1 of 4</span><span class="dots"><i></i><i></i><i></i><i></i></span></div>
     <div class="qcard" id="q1" style="left:24px; top:356px"><div class="qhead"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linejoin="round"><path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.6"/></svg>Clue 1</div><div class="qthumb"><canvas id="advThumb" width="160" height="96"></canvas></div><div class="qflash"></div></div>
     <div class="qcard" id="q2" style="left:416px; top:356px"><div class="qhead"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linejoin="round" stroke-linecap="round"><rect x="3.5" y="5" width="17" height="15" rx="2"/><path d="M3.5 10h17M8 3v4M16 3v4"/></svg>Clue 2</div><div class="qbody"><span class="qlbl">Released</span><span class="qbig">1980</span></div><div class="qflash"></div></div>
-    <div class="qcard" id="q3" style="left:24px; top:666px"><div class="qhead"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linejoin="round"><path d="m12 3 2.7 5.6 6.1.8-4.5 4.2 1.1 6.1L12 16.8 6.6 19.7l1.1-6.1-4.5-4.2 6.1-.8z"/></svg>Clue 3</div><div class="qbody qrow"><svg class="qegg" viewBox="0 0 60 76"><path d="M30 3C15 3 4 28 4 46c0 16 12 27 26 27s26-11 26-27C56 28 45 3 30 3z" fill="#fff" stroke="rgb(0,91,111)" stroke-width="5"/><path d="M8 44l9-7 9 8 9-8 9 8 8-7" fill="none" stroke="rgb(255,174,23)" stroke-width="6" stroke-linejoin="round"/><circle cx="21" cy="57" r="4" fill="rgb(0,116,200)"/><circle cx="39" cy="60" r="4" fill="rgb(0,116,200)"/><circle cx="30" cy="24" r="4" fill="rgb(0,116,200)"/></svg><div class="qcol"><span class="qlbl">Iconic detail</span><span class="qfact">Hid the first video game Easter egg</span></div></div><div class="qflash"></div></div>
+    <div class="qcard" id="q3" style="left:24px; top:666px"><div class="qhead"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linejoin="round"><path d="m12 3 2.7 5.6 6.1.8-4.5 4.2 1.1 6.1L12 16.8 6.6 19.7l1.1-6.1-4.5-4.2 6.1-.8z"/></svg>Clue 3</div><div class="qbody qrow"><svg class="qegg" viewBox="0 0 60 76"><path d="M30 3C15 3 4 28 4 46c0 16 12 27 26 27s26-11 26-27C56 28 45 3 30 3z" fill="#fff" stroke="rgb(0,91,111)" stroke-width="5"/><path d="M8 44l9-7 9 8 9-8 9 8 8-7" fill="none" stroke="rgb(255,174,23)" stroke-width="6" stroke-linejoin="round"/><circle cx="21" cy="57" r="4" fill="rgb(0,116,200)"/><circle cx="39" cy="60" r="4" fill="rgb(0,116,200)"/><circle cx="30" cy="24" r="4" fill="rgb(0,116,200)"/></svg><div class="qcol"><span class="qlbl">Iconic detail</span><span class="qfact">First<br>Easter egg</span></div></div><div class="qflash"></div></div>
     <div class="qcard" id="q4" style="left:416px; top:666px"><div class="qhead"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linejoin="round" stroke-linecap="round"><path d="M3 18 7.5 6 12 18M4.8 13.5h5.4M14 18h7"/></svg>Clue 4</div><div class="qbody"><span class="qlbl">First letter</span><span class="qletters"><b class="on">A</b><b></b><b></b><b></b><b></b><b></b><b></b><b></b><b></b></span></div><div class="qflash"></div></div>
 
     <!-- Alt2 only: the guess is typed in the game itself -->
@@ -334,8 +334,10 @@ const ALT2_TL = {
   cutAt: 5.7, endCard: 2.3, tagStart: 0.55, tagStep: 0.22,
 };
 const TL = VARIANT === 'alt2' ? ALT2_TL : VARIANT === 'v4' ? {
-  // alt2's realization and game, after a 5s hook with four game-style clue cards (11s total)
-  ...ALT2_TL, hook: 5.0, bubbleType: [0.45, 1.7], chips: null, clueAt: [1.15, 2.05, 2.95, 3.85],
+  // alt2's realization and game, after a 4.4s hook with four game-style clue cards (10s total)
+  ...ALT2_TL, hook: 4.4, bubbleType: [0.4, 1.5], chips: null, clueAt: [1.0, 1.75, 2.5, 3.25],
+  typeStart: 3.35, typeStep: 0.11, zoomIn: [3.1, 3.4], zoomOut: [4.55, 4.9],
+  cutAt: 5.5, endCard: 2.1, tagStart: 0.5, tagStep: 0.2,
 } : VARIANT === 'v3' ? {
   // clue cards (t) instead of chips; keyboard opens at r = trayOpen
   hook: 4.0, bubbleType: [0.5, 1.8], cards: [1.6, 2.6], trayOpen: [2.8, 3.1],
