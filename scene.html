@@ -48,7 +48,7 @@
   .kb-ph { color: color-mix(in srgb, var(--ink-dark) 45%, transparent); font-weight: 600; }
   .kb-caret { width: 4px; height: 1.15em; border-radius: 2px; background: currentColor; flex: none; }
 
-  #think { left: 70px; top: 90px; transform-origin: 92% 100%; }
+  #think { left: 70px; top: 90px; transform-origin: 92% 100%; z-index: 5; }   /* the thought bubble always draws over the clues */
   #thinkField { height: auto; padding: 18px 36px 20px; font-size: 56px; line-height: 1.22; border-radius: 28px; align-items: flex-end; }
   #thinkField .kb-caret { margin-bottom: 0.12em; }
   .puff { position: absolute; background: #fff; border: 4px solid var(--base-secondary); border-radius: 50%; box-shadow: 0 5px 0 0 var(--base-secondary); }
@@ -694,7 +694,7 @@ window.ready = (async () => {
   if (CLUE_CARDS) $('correct2').lastChild.textContent = ' Got it on clue 4!';
   if (VARIANT === 'v5') {
     // no counter: lift the card grid into the space it leaves under the bubble
-    [['q1', 318], ['q2', 318], ['q3', 626], ['q4', 626]].forEach(([id, top]) => { $(id).style.top = top + 'px'; });
+    [['q1', 352], ['q2', 352], ['q3', 660], ['q4', 660]].forEach(([id, top]) => { $(id).style.top = top + 'px'; });
   } await maybeRealScreenshot();
   await document.fonts.load('40px "Fugaz One"'); await document.fonts.load('700 40px "Work Sans"'); await document.fonts.load('800 40px "Work Sans"');
   await preloadMoby();
