@@ -1,11 +1,12 @@
 # Guess Moby's Game spot
 
-Four cuts, all 1500×1000, 60fps, H.264, no audio:
+Five cuts, all 1500×1000, 60fps, H.264, no audio:
 
 - `out/guess-mobys-game-v1.mp4` (12s): the answer is typed into a guess bar beside Moby.
 - `out/guess-mobys-game-alt2.mp4` (10s): the guess is typed on the in-game keyboard over a blurred screenshot clue.
 - `out/guess-mobys-game-v3.mp4` (10s): mostly gameplay. The Play screen is up from the first frame, the clues arrive as in-game clue cards, and Moby thinks and solves beside it.
 - `out/guess-mobys-game-v4.mp4` (10s): Alt 2 with clearer clues. Four game-style clue cards fade up one by one over 4.4s with a "Clue n of 4" counter. Each card leads with a big "Clue 1–4" header and icon; each holds one glanceable item (a blurred screenshot, *1980*, *First Easter egg*, the first letter *A*) so the eye counts four clues without having to read. Then the in-game typing with the close-up, ending on "Got it on clue 4!".
+- `out/guess-mobys-game-v5.mp4` (10s): Version 4 without the "Clue n of 4" counter; the card grid moves up into its space.
 
 | Beat | Version 1 (12s) | Alt 2 (10s) | Version 3 (10s) |
 |------|-----------------|-------------|-----------------|
@@ -33,6 +34,7 @@ node scripts/render.cjs                  # Version 1 → out/guess-mobys-game-v1
 node scripts/render.cjs --variant alt2   # Alt 2     → out/guess-mobys-game-alt2.mp4
 node scripts/render.cjs --variant v3     # Version 3 → out/guess-mobys-game-v3.mp4
 node scripts/render.cjs --variant v4     # Version 4 → out/guess-mobys-game-v4.mp4
+node scripts/render.cjs --variant v5     # Version 5 → out/guess-mobys-game-v5.mp4
 node scripts/render.cjs --variant alt2 --stills 1,4.6,7.3   # quick preview PNGs
 ```
 
