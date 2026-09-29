@@ -86,6 +86,7 @@
   .confetti { position: absolute; width: 18px; height: 26px; border: 3px solid var(--base-secondary); border-radius: 4px; }
 
   #flash { background: #fff; opacity: 0; }
+  #iris { pointer-events: none; z-index: 20; }
 
   /* ---- v4: game-style clue cards with real content ---------------- */
   #clueCount { left: 24px; top: 302px; display: inline-flex; align-items: center; gap: 18px; padding: 11px 24px;
@@ -266,6 +267,7 @@
   </div>
 
   <div id="flash" class="layer"></div>
+  <div id="iris" class="layer"></div>
 </div>
 
 <script>
@@ -340,7 +342,7 @@ const TL = VARIANT === 'alt2' ? ALT2_TL : CLUE_CARDS ? {
   // alt2's realization and game, after a 4.4s hook with four game-style clue cards (10s total)
   ...ALT2_TL, hook: 4.4, bubbleType: [0.4, 1.5], chips: null, clueAt: [1.0, 1.75, 2.5, 3.25],
   typeStart: 3.35, typeStep: 0.11, zoomIn: [3.1, 3.4], zoomOut: [4.55, 4.9],
-  cutAt: 5.5, endCard: VARIANT === 'v5' ? 1.6 : 2.1, tagStart: 0.5, tagStep: 0.2,
+  cutAt: 5.5, endCard: VARIANT === 'v5' ? 1.53 : 2.1, tagStart: 0.5, tagStep: 0.2,
 } : VARIANT === 'v3' ? {
   // clue cards (t) instead of chips; keyboard opens at r = trayOpen
   hook: 4.0, bubbleType: [0.5, 1.8], cards: [1.6, 2.6], trayOpen: [2.8, 3.1],
@@ -356,7 +358,10 @@ const SHIFT = HOOK - 2;
 // v5 opens on its own final frame, held still (PRE_HOLD) then dissolved into the
 // animation (PRE_FADE), so slow devices show a finished image while loading and
 // the loop wraps seamlessly. Everything else runs on the animation clock a = t - PRE_HOLD.
-const PRE_HOLD = VARIANT === 'v5' ? 0.5 : 0, PRE_FADE = VARIANT === 'v5' ? 0.3 : 0;
+const IRIS = VARIANT === 'v5';   // v5 uses iris wipes instead of the dissolve and white flash
+const HOLD_STILL = IRIS ? 0.35 : 0;   // truly static first frames
+const IRIS_CLOSE = 0.22, IRIS_OPEN = 0.32;
+const PRE_HOLD = IRIS ? HOLD_STILL + IRIS_CLOSE : 0, PRE_FADE = 0;
 const CUT = SHIFT + TL.cutAt;   // flash cut to the end card (animation clock)
 const DUR = PRE_HOLD + CUT + TL.endCard, FPS = 60;
 
@@ -470,6 +475,21 @@ async function maybeRealScreenshot() {
   g.drawImage(im, 0, 0);
 }
 
+// Iris wipe: dark-teal cover with a yellow rim and a round hole of radius r at (x, y).
+const IRIS_MAX = 1850;   // "fully open"
+// radius at which the hole just clears the farthest screen corner from (x, y)
+const irisFull = (x, y) => Math.hypot(Math.max(x, 1500 - x), Math.max(y, 1000 - y)) + 16;
+// k: 0 = closed, 1 = open
+function irisK(k, x, y) { iris(k >= 1 ? IRIS_MAX : lerp(0, irisFull(x, y), k), x, y); }
+function iris(r, x = 750, y = 500) {
+  const el = $('iris');
+  if (r >= IRIS_MAX) { el.style.background = 'none'; return; }
+  r = Math.max(0, r);
+  el.style.background = `radial-gradient(circle at ${x}px ${y}px, transparent ${r}px, rgb(255,174,23) ${r}px, ` +
+    `rgb(255,174,23) ${r + 14}px, rgb(0,91,111) ${r + 14}px)`;
+}
+const IRIS_AT = { logo: [750, 400], moby: [1110, 470], solved: [420, 420] };
+
 async function renderAt(t) {
   const lastFrame = DUR - 1 / FPS;
   const holding = t < PRE_HOLD;
@@ -481,10 +501,11 @@ async function renderAt(t) {
   if (!bg.src.endsWith(src)) { bg.src = src; await bg.decode(); }
 
   if (holding) {
-    // still image of the finished end card
+    // still image of the finished end card; with IRIS, it then closes on the logo
     $('sceneAB').style.display = 'none'; $('sceneC').style.display = 'block';
     $('sceneC').style.opacity = 1; $('flash').style.opacity = 0;
     renderC(lastFrame - PRE_HOLD - CUT); camera(0);
+    if (IRIS && t >= HOLD_STILL) irisK(1 - easeInOut(prog(t, HOLD_STILL, PRE_HOLD)), ...IRIS_AT.logo); else iris(IRIS_MAX);
     return;
   }
   const a = t - PRE_HOLD;   // animation clock
@@ -495,8 +516,18 @@ async function renderAt(t) {
   $('sceneC').style.display = inC || fade > 0 ? 'block' : 'none';
   $('sceneC').style.opacity = inC ? 1 : fade;
 
-  // Flash cut to the end card
-  $('flash').style.opacity = a >= CUT - 0.07 && a < CUT + 0.2 ? (a < CUT ? prog(a, CUT - 0.07, CUT) : 1 - prog(a, CUT, CUT + 0.2)) * 0.9 : 0;
+  if (IRIS) {
+    // iris opens on Moby, closes on the solved game, opens again on the logo
+    $('flash').style.opacity = 0;
+    if (a < IRIS_OPEN) irisK(easeInOut(prog(a, 0, IRIS_OPEN)), ...IRIS_AT.moby);
+    else if (a >= CUT - IRIS_CLOSE && a < CUT) irisK(1 - easeInOut(prog(a, CUT - IRIS_CLOSE, CUT)), ...IRIS_AT.solved);
+    else if (a >= CUT && a < CUT + IRIS_OPEN) irisK(easeInOut(prog(a, CUT, CUT + IRIS_OPEN)), ...IRIS_AT.logo);
+    else iris(IRIS_MAX);
+  } else {
+    iris(IRIS_MAX);
+    // Flash cut to the end card
+    $('flash').style.opacity = a >= CUT - 0.07 && a < CUT + 0.2 ? (a < CUT ? prog(a, CUT - 0.07, CUT) : 1 - prog(a, CUT, CUT + 0.2)) * 0.9 : 0;
+  }
 
   if (!inC) {
     renderAB(a);
