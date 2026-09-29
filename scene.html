@@ -342,7 +342,7 @@ const TL = VARIANT === 'alt2' ? ALT2_TL : CLUE_CARDS ? {
   // alt2's realization and game, after a 4.4s hook with four game-style clue cards (10s total)
   ...ALT2_TL, hook: 4.4, bubbleType: [0.4, 1.5], chips: null, clueAt: [1.0, 1.75, 2.5, 3.25],
   typeStart: 3.35, typeStep: 0.11, zoomIn: [3.1, 3.4], zoomOut: [4.55, 4.9],
-  cutAt: 5.5, endCard: VARIANT === 'v5' ? 1.53 : 2.1, tagStart: 0.5, tagStep: 0.2,
+  cutAt: 5.5, endCard: VARIANT === 'v5' ? 1.75 : 2.1, tagStart: 0.5, tagStep: 0.2,
 } : VARIANT === 'v3' ? {
   // clue cards (t) instead of chips; keyboard opens at r = trayOpen
   hook: 4.0, bubbleType: [0.5, 1.8], cards: [1.6, 2.6], trayOpen: [2.8, 3.1],
@@ -358,10 +358,10 @@ const SHIFT = HOOK - 2;
 // v5 opens on its own final frame, held still (PRE_HOLD) then dissolved into the
 // animation (PRE_FADE), so slow devices show a finished image while loading and
 // the loop wraps seamlessly. Everything else runs on the animation clock a = t - PRE_HOLD.
-const IRIS = VARIANT === 'v5';   // v5 uses iris wipes instead of the dissolve and white flash
+const IRIS = VARIANT === 'v5';   // v5 opens with an iris wipe (instead of a dissolve) and cuts cleanly to the end card
 const HOLD_STILL = IRIS ? 0.35 : 0;   // truly static first frames
-const IRIS_CLOSE = 0.22, IRIS_OPEN = 0.32;
-const PRE_HOLD = IRIS ? HOLD_STILL + IRIS_CLOSE : 0, PRE_FADE = 0;
+const IRIS_OPEN = 0.4;   // one swoop: a hole grows from Moby and pushes the end card off
+const PRE_HOLD = HOLD_STILL, PRE_FADE = 0;
 const CUT = SHIFT + TL.cutAt;   // flash cut to the end card (animation clock)
 const DUR = PRE_HOLD + CUT + TL.endCard, FPS = 60;
 
@@ -488,7 +488,7 @@ function iris(r, x = 750, y = 500) {
   el.style.background = `radial-gradient(circle at ${x}px ${y}px, transparent ${r}px, rgb(255,174,23) ${r}px, ` +
     `rgb(255,174,23) ${r + 14}px, rgb(0,91,111) ${r + 14}px)`;
 }
-const IRIS_AT = { logo: [750, 400], moby: [1110, 470], solved: [420, 420] };
+const IRIS_AT = { logo: [750, 400], moby: [1110, 470] };
 
 async function renderAt(t) {
   const lastFrame = DUR - 1 / FPS;
@@ -505,24 +505,35 @@ async function renderAt(t) {
     $('sceneAB').style.display = 'none'; $('sceneC').style.display = 'block';
     $('sceneC').style.opacity = 1; $('flash').style.opacity = 0;
     renderC(lastFrame - PRE_HOLD - CUT); camera(0);
-    if (IRIS && t >= HOLD_STILL) irisK(1 - easeInOut(prog(t, HOLD_STILL, PRE_HOLD)), ...IRIS_AT.logo); else iris(IRIS_MAX);
+    iris(IRIS_MAX); $('sceneC').style.webkitMaskImage = $('sceneC').style.maskImage = 'none';
     return;
   }
   const a = t - PRE_HOLD;   // animation clock
   const inC = a >= CUT;
   // dissolve from the held end card into the opening
   const fade = PRE_FADE && a < PRE_FADE ? 1 - easeInOut(prog(a, 0, PRE_FADE)) : 0;
+  const swoop = IRIS && a < IRIS_OPEN;
   $('sceneAB').style.display = inC ? 'none' : 'block';
-  $('sceneC').style.display = inC || fade > 0 ? 'block' : 'none';
-  $('sceneC').style.opacity = inC ? 1 : fade;
+  $('sceneC').style.display = inC || fade > 0 || swoop ? 'block' : 'none';
+  $('sceneC').style.opacity = inC || swoop ? 1 : fade;
 
   if (IRIS) {
-    // iris opens on Moby, closes on the solved game, opens again on the logo
+    // one swoop as Moby comes in: a hole grows from him through the end card, rim leading;
+    // the change to the end card later is a clean cut
     $('flash').style.opacity = 0;
-    if (a < IRIS_OPEN) irisK(easeInOut(prog(a, 0, IRIS_OPEN)), ...IRIS_AT.moby);
-    else if (a >= CUT - IRIS_CLOSE && a < CUT) irisK(1 - easeInOut(prog(a, CUT - IRIS_CLOSE, CUT)), ...IRIS_AT.solved);
-    else if (a >= CUT && a < CUT + IRIS_OPEN) irisK(easeInOut(prog(a, CUT, CUT + IRIS_OPEN)), ...IRIS_AT.logo);
-    else iris(IRIS_MAX);
+    const [mx, my] = IRIS_AT.moby;
+    if (swoop) {
+      const r = lerp(0, irisFull(mx, my) + 30, easeInOut(prog(a, 0, IRIS_OPEN)));
+      const hole = `radial-gradient(circle at ${mx}px ${my}px, transparent ${r}px, #000 ${r + 1}px)`;
+      $('sceneC').style.webkitMaskImage = $('sceneC').style.maskImage = hole;
+      $('sceneAB').style.clipPath = `circle(${r}px at ${mx}px ${my}px)`;   // the opening only shows inside the hole
+      $('iris').style.background = `radial-gradient(circle at ${mx}px ${my}px, transparent ${r - 14}px, rgb(255,174,23) ${r - 14}px, ` +
+        `rgb(255,174,23) ${r}px, transparent ${r}px)`;
+    } else {
+      $('sceneC').style.webkitMaskImage = $('sceneC').style.maskImage = 'none';
+      $('sceneAB').style.clipPath = 'none';
+      iris(IRIS_MAX);
+    }
   } else {
     iris(IRIS_MAX);
     // Flash cut to the end card
@@ -531,7 +542,7 @@ async function renderAt(t) {
 
   if (!inC) {
     renderAB(a);
-    if (fade > 0) renderC(lastFrame - PRE_HOLD - CUT);
+    if (fade > 0 || swoop) renderC(lastFrame - PRE_HOLD - CUT);
   } else renderC(a - CUT);
   camera(inC ? 0 : zoomAmount(a - SHIFT));
 }
@@ -727,7 +738,7 @@ function renderGame(r, t) {
 }
 
 function renderC(lt) {
-  pop($('logo'), lt, 0.1);
+  pop($('logo'), lt, IRIS ? 0 : 0.1);   // v5 cuts straight in, so the logo pops on the cut frame
   ['t1', 't2', 't3'].forEach((id, i) => {
     const k = easeOut(prog(lt, TL.tagStart + i * TL.tagStep, TL.tagStart + 0.3 + i * TL.tagStep));
     set($(id), k, `translateY(${lerp(40, 0, k)}px) scale(${lerp(0.8, 1, back(k))})`);
