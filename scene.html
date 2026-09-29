@@ -340,7 +340,7 @@ const TL = VARIANT === 'alt2' ? ALT2_TL : CLUE_CARDS ? {
   // alt2's realization and game, after a 4.4s hook with four game-style clue cards (10s total)
   ...ALT2_TL, hook: 4.4, bubbleType: [0.4, 1.5], chips: null, clueAt: [1.0, 1.75, 2.5, 3.25],
   typeStart: 3.35, typeStep: 0.11, zoomIn: [3.1, 3.4], zoomOut: [4.55, 4.9],
-  cutAt: 5.5, endCard: 2.1, tagStart: 0.5, tagStep: 0.2,
+  cutAt: 5.5, endCard: VARIANT === 'v5' ? 1.6 : 2.1, tagStart: 0.5, tagStep: 0.2,
 } : VARIANT === 'v3' ? {
   // clue cards (t) instead of chips; keyboard opens at r = trayOpen
   hook: 4.0, bubbleType: [0.5, 1.8], cards: [1.6, 2.6], trayOpen: [2.8, 3.1],
@@ -353,8 +353,12 @@ const TL = VARIANT === 'alt2' ? ALT2_TL : CLUE_CARDS ? {
 };
 const HOOK = TL.hook;
 const SHIFT = HOOK - 2;
-const CUT = SHIFT + TL.cutAt;   // flash cut to the end card
-const DUR = CUT + TL.endCard, FPS = 60;
+// v5 opens on its own final frame, held still (PRE_HOLD) then dissolved into the
+// animation (PRE_FADE), so slow devices show a finished image while loading and
+// the loop wraps seamlessly. Everything else runs on the animation clock a = t - PRE_HOLD.
+const PRE_HOLD = VARIANT === 'v5' ? 0.5 : 0, PRE_FADE = VARIANT === 'v5' ? 0.3 : 0;
+const CUT = SHIFT + TL.cutAt;   // flash cut to the end card (animation clock)
+const DUR = PRE_HOLD + CUT + TL.endCard, FPS = 60;
 
 // ===== Moby clip retime =====
 // Source is ~24.1fps, 121 frames. Thinking is frames 8–96; frames 72 and 96 are
@@ -467,20 +471,38 @@ async function maybeRealScreenshot() {
 }
 
 async function renderAt(t) {
-  // Background loop (60fps, 480 frames) — wraps after 8s
-  const bf = (Math.floor(t * 60) % 480) + 1;
+  const lastFrame = DUR - 1 / FPS;
+  const holding = t < PRE_HOLD;
+  // Background loop (60fps, 480 frames) — wraps after 8s. During the opening hold
+  // it shows the last frame's background, so frame 0 matches the final frame.
+  const bt = holding ? lastFrame : t;
+  const bf = (Math.floor(bt * 60) % 480) + 1;
   const bg = $('bg'); const src = `build/bg/${pad(bf)}.jpg`;
   if (!bg.src.endsWith(src)) { bg.src = src; await bg.decode(); }
 
-  const inC = t >= CUT;
+  if (holding) {
+    // still image of the finished end card
+    $('sceneAB').style.display = 'none'; $('sceneC').style.display = 'block';
+    $('sceneC').style.opacity = 1; $('flash').style.opacity = 0;
+    renderC(lastFrame - PRE_HOLD - CUT); camera(0);
+    return;
+  }
+  const a = t - PRE_HOLD;   // animation clock
+  const inC = a >= CUT;
+  // dissolve from the held end card into the opening
+  const fade = PRE_FADE && a < PRE_FADE ? 1 - easeInOut(prog(a, 0, PRE_FADE)) : 0;
   $('sceneAB').style.display = inC ? 'none' : 'block';
-  $('sceneC').style.display = inC ? 'block' : 'none';
+  $('sceneC').style.display = inC || fade > 0 ? 'block' : 'none';
+  $('sceneC').style.opacity = inC ? 1 : fade;
 
   // Flash cut to the end card
-  $('flash').style.opacity = t >= CUT - 0.07 && t < CUT + 0.2 ? (t < CUT ? prog(t, CUT - 0.07, CUT) : 1 - prog(t, CUT, CUT + 0.2)) * 0.9 : 0;
+  $('flash').style.opacity = a >= CUT - 0.07 && a < CUT + 0.2 ? (a < CUT ? prog(a, CUT - 0.07, CUT) : 1 - prog(a, CUT, CUT + 0.2)) * 0.9 : 0;
 
-  if (!inC) renderAB(t); else renderC(t - CUT);
-  camera(inC ? 0 : zoomAmount(t - SHIFT));
+  if (!inC) {
+    renderAB(a);
+    if (fade > 0) renderC(lastFrame - PRE_HOLD - CUT);
+  } else renderC(a - CUT);
+  camera(inC ? 0 : zoomAmount(a - SHIFT));
 }
 
 // ---- alt2 / v3 camera: push in close on the typed guess, pull back once it is in ----
